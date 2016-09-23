@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>kaeru</title>
+    <link rel="stylesheet" type="text/css" href="kaeru.css">
+</head>
+<body>
+<div id="target_area">
+    <textarea id="ta_target"></textarea>
+    <div class="child">
+        <button id="b_undo"><-</button>
+        <button id="b_redo">-></button>
+        <button id="b_copy">copy</button>
+        <button id="b_save">save</button>
+        <button id="b_clear">clear</button>
+        <button id="b_deleteAll">delete all</button>
+        <!--<div>-->
+            <!--<input type="text" id="t_message_key"/>-->
+            <!--<br>-->
+            <!--<button id="b_send">send</button>-->
+            <!--<button id="b_receive">receive</button>-->
+        <!--</div>-->
+    </div>
+</div>
+<div id="save" class="m_vertical">
+    <button id="b_saveToggle">open</button>
+    <div id="backup">
+        <button id="b_backup">backup</button>
+        <input type="file" id="f_import" multiple/>
+    </div>
+    <div id="save_area"></div>
+</div>
+<div id="control">
+    <div id="kaeru">
+        <button id="b_countLetter">count letter</button>
+        <label id="l_countLetterValue">_</label>
+        <label id="l_countLetter">letters</label>
+        <button id="b_countRow">count row</button>
+        <label id="l_countRowValue">_</label>
+        <label id="l_countRow">rows</label>
+        </br>
+        <button id="b_upper">upper</button>
+        <button id="b_lower">lower</button>
+        </br>
+        <button id="b_prefix">prefix</button>
+        <input type="text" id="t_fix">
+        <button id="b_suffix">suffix</button>
+        </br>
+        <button id="b_delHead1">-1</button>
+        <button id="b_delHead">del</button>
+        <input type="number" id="t_delCount" min="0" value="1">
+        <button id="b_delTail">del</button>
+        <button id="b_delTail1">-1</button>
+        </br>
+        <button id="b_cutHead">cut</button>
+        <button id="b_cutHeadWithVal">cut+</button>
+        <input type="text" id="t_cutVal">
+        <button id="b_cutTailWithVal">cut+</button>
+        <button id="b_cutTail">cut</button>
+        </br>
+        <input type="text" id="t_repOrg">
+        <button id="b_replace">replace</button>
+        <button id="b_replaceRegex">replace(regex)</button>
+        <input type="text" id="t_repDest">
+        </br>
+        <button id="b_distinct">distinct</button>
+        <button id="b_duplication">duplication</button>
+        <button id="b_single">single</button>
+        </br>
+        <button id="b_sortAsc">asc</button>
+        <button id="b_sortDesc">desc</button>
+        </br>
+        <button id="b_closeUp">close up</button>
+        </br>
+        <button id="b_incHead">head</button>
+        <button id="b_incAny">any</button>
+        <button id="b_incTail">tail</button>
+        <input type="text" id="t_incVal">
+        <button id="b_notIncHead">head</button>
+        <button id="b_notIncAny">any</button>
+        <button id="b_notIncTail">tail</button>
+        </br>
+        <button id="b_break">break</button>
+        <input type="text" id="t_break">
+        </br>
+        <button id="b_order">order</button>
+        <input type="text" id="t_order">
+        </br>
+        <button id="b_toCamel">toCamel</button>
+        <button id="b_toSnake">toSnake</button>
+    </div>
+    <div id="multiReplace">
+        <textarea id="ta_replaceOrg" class="m_horizon"></textarea>
+        <div id="replaceButtons">
+            <button id="b_multiReplace">multi replace</button>
+            <br>
+            <button id="b_multiReplaceRegex">multi replace(regex)</button>
+        </div>
+        <textarea id="ta_replaceDest" class="m_horizon"></textarea>
+    </div>
+    <div id="sequence">
+        <input type="text" id="t_seqOrg">
+        <div id="seqStart" class="m_horizon">
+            <label id="l_seqStart">start</label>
+            <input type="number" id="t_seqStart" value="0">
+        </div>
+        <div id="seqStep" class="m_horizon">
+            <label id="l_seqStep">step</label>
+            <input type="number" id="t_seqStep" value="0">
+        </div>
+        <div id="seqLines" class="m_horizon">
+            <label id="l_seqLines">lines</label>
+            <input type="number" id="t_seqLines" value="1">
+        </div>
+        <div id="seqToken" class="m_horizon">
+            <label id="l_seqToken">token</label>
+            <input type="text" id="t_seqToken" value="#">
+        </div>
+        <button id="b_sequence">sequence</button>
+        <textarea id="ta_seqResult" class="margin"></textarea>
+    </div>
+    <div id="cymbal">
+        <div class="m_horizon">
+            <textarea class="ta_cymbal"></textarea>
+            <button class="b_cymbalForward">join-></button>
+        </div>
+        <div class="m_horizon">
+            <textarea class="ta_cymbal"></textarea>
+            <button class="b_cymbalForward">join-></button>
+        </div>
+        <div class="m_horizon">
+            <textarea class="ta_cymbal"></textarea>
+        </div>
+        <div class="m_horizon">
+            <textarea class="ta_cymbal"></textarea>
+            <button class="b_cymbalBack"><-join</button>
+        </div>
+        <div class="m_horizon">
+            <textarea class="ta_cymbal"></textarea>
+            <button class="b_cymbalBack"><-join</button>
+        </div>
+    </div>
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/zeroclipboard/2.2.0/ZeroClipboard.min.js"></script>
+<script src="kaeru.js"></script>
+</body>
+</html>

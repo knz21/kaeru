@@ -1,0 +1,93 @@
+body {
+    background-color: #fff;
+}
+
+.margin {
+    margin: 3px;
+}
+
+.m_vertical {
+    margin-bottom: 5px;
+    margin-top: 5px;
+}
+
+.m_horizon {
+    margin-left: 3px;
+    margin-right: 3px;
+}
+
+textarea {
+    min-height: 36px;
+    min-width: 172px;
+}
+
+/*div.clearfix:after {*/
+    /*content: ".";*/
+    /*display: block;*/
+    /*visibility: hidden;*/
+    /*height: 0.1px;*/
+    /*font-size: 0.1em;*/
+    /*line-height: 0;*/
+    /*clear: both;*/
+/*}*/
+
+#ta_target {
+    width: 100%;
+    height: 300px;
+}
+
+.child {
+    display: inline-block;
+    vertical-align: top;
+}
+
+#b_deleteAll {
+    display: none;
+}
+
+.ta_saveChild {
+    display: block;
+}
+
+#save_area {
+    display: none;
+}
+
+#control > div {
+    float: left;
+    background-color: #fff;
+}
+
+#multiReplace textarea {
+    width: 200px;
+    height: 100px;
+    float: left;
+}
+
+#multiReplace div {
+    float: left;
+}
+
+#t_seqOrg {
+    width: 100%;
+}
+
+#sequence div {
+    float: left;
+}
+
+#ta_seqResult {
+    width: 100%;
+    height: 150px;
+}
+
+#cymbal div {
+    float: left;
+    text-align: center;
+}
+
+.ta_cymbal {
+    width: 200px;
+    height: 200px;
+    display: block;
+}
