@@ -22,8 +22,8 @@ function bindActions() {
     bindWithoutHistory('#b_save', saveAction);
     bind('#b_clear', clearAction);
     bind('#b_deleteAll', deleteAllAction);
-    bindWithoutHistory('#b_send', sendAction);
-    bind('#b_receive', receiveAction);
+    //bindWithoutHistory('#b_send', sendAction);
+    //bind('#b_receive', receiveAction);
     var $saveArea = $('#save_area');
     $saveArea.on('click', '.b_saveChild', childSaveAction);
     $saveArea.on('click', '.b_deleteChild', childDeleteAction);
@@ -327,7 +327,6 @@ function childExpandAction(event) {
 function saveToggleAction() {
     var $button = $('#b_saveToggle');
     var isOpen = $button.text() === 'open';
-    console.log(isOpen);
     $('#save_area').css('display', isOpen ? 'block' : 'none');
     $button.text(isOpen ? 'close' : 'open');
 }
