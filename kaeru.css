@@ -2,8 +2,9 @@ body {
     background-color: #fff;
 }
 
-.margin {
-    margin: 3px;
+button {
+    font-size: 13px;
+    text-transform: none;
 }
 
 .m_vertical {
@@ -14,6 +15,10 @@ body {
 .m_horizon {
     margin-left: 3px;
     margin-right: 3px;
+}
+
+.invisible {
+    display: none;
 }
 
 textarea {
@@ -32,8 +37,10 @@ textarea {
 /*}*/
 
 #ta_target {
-    width: 100%;
+    width: 99%;
     height: 300px;
+    display: block;
+    margin: 5px auto;
 }
 
 .child {
@@ -55,7 +62,6 @@ textarea {
 
 #control > div {
     float: left;
-    background-color: #fff;
 }
 
 #multiReplace textarea {
@@ -82,12 +88,12 @@ textarea {
 }
 
 #cymbal div {
+    width: 20%;
     float: left;
     text-align: center;
 }
 
 .ta_cymbal {
-    width: 200px;
     height: 200px;
     display: block;
 }

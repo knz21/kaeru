@@ -22,6 +22,7 @@ function bindActions() {
     bindWithoutHistory('#b_save', saveAction);
     bind('#b_clear', clearAction);
     bind('#b_deleteAll', deleteAllAction);
+    bindWithoutHistory('.tab_button', switchTabContentAction);
     //bindWithoutHistory('#b_send', sendAction);
     //bind('#b_receive', receiveAction);
     var $saveArea = $('#save_area');
@@ -29,7 +30,6 @@ function bindActions() {
     $saveArea.on('click', '.b_deleteChild', childDeleteAction);
     $saveArea.on('click', '.b_reduceChild', childReduceAction);
     $saveArea.on('click', '.b_expandChild', childExpandAction);
-    bindWithoutHistory('#b_saveToggle', saveToggleAction);
     bindWithoutHistory('#b_countLetter', countLetterAction);
     bindWithoutHistory('#b_countRow', countRowAction);
     bind('#b_upper', upperAction);
@@ -86,11 +86,11 @@ function innerBind(id, func) {
 }
 
 function setSaveHistory(func) {
-    return function () {
+    return function (event) {
         if (localHistory.length == 0) {
             localHistory.push($target.val());
         }
-        func();
+        func(event);
         if (historyIndex < localHistory.length - 1) {
             localHistory = localHistory.slice(0, historyIndex + 1);
         }
@@ -235,6 +235,14 @@ function deleteAllAction() {
     }
 }
 
+function switchTabContentAction(event) {
+    var targetIndex = $('.tab_button').index($(event.target));
+    $.each($('.tab_content'), function (idx, content) {
+        $obj = $(content);
+        idx === targetIndex ? $obj.removeClass('invisible') : $obj.addClass('invisible');
+    });
+}
+
 function sendAction() {//TODO
     //var key = $('#t_message_key').val();
     //if (key.length == 0 || $target.val().length == 0) {
@@ -322,13 +330,6 @@ function childExpandAction(event) {
     var $thisButton = $(event.target);
     var $thisTextArea = $thisButton.parent().find('.ta_saveChild');
     changeSize($thisTextArea, $thisTextArea[0].scrollHeight, $thisTextArea[0].scrollWidth);
-}
-
-function saveToggleAction() {
-    var $button = $('#b_saveToggle');
-    var isOpen = $button.text() === 'open';
-    $('#save_area').css('display', isOpen ? 'block' : 'none');
-    $button.text(isOpen ? 'close' : 'open');
 }
 
 function countLetterAction() {
@@ -697,7 +698,7 @@ function getNewSaveChild(key, val) {
 }
 
 function setChildCopyAction() {
-    var $children = $('#target_area').find('.child');
+    var $children = $('#save_area').find('.child');
     var $lastChild = $($children.get($children.length - 1));
     setCopy($lastChild.find('.b_copyChild'), $lastChild.find('.ta_saveChild'));
 }

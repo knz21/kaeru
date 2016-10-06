@@ -3,12 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <title>kaeru</title>
+    <link rel="stylesheet" type="text/css" href="normalize.css">
+    <link rel="stylesheet" type="text/css" href="skeleton.css">
     <link rel="stylesheet" type="text/css" href="kaeru.css">
 </head>
 <body>
-<div id="target_area">
-    <textarea id="ta_target"></textarea>
-    <div class="child">
+<textarea id="ta_target"></textarea>
+<div id="target_area" class="container">
+    <div class="child row">
         <button id="b_undo"><-</button>
         <button id="b_redo">-></button>
         <button id="b_copy">copy</button>
@@ -23,22 +25,28 @@
         <!--</div>-->
     </div>
 </div>
-<div id="save" class="m_vertical">
-    <button id="b_saveToggle">open</button>
+<div id="tab_menu" class="container">
+    <div id="tab_buttons" class="row">
+        <button class="tab_button four columns selected">storage</button>
+        <button class="tab_button four columns">functions</button>
+        <button class="tab_button four columns">others</button>
+    </div>
+</div>
+<div id="save" class="container tab_content">
     <div id="backup">
         <button id="b_backup">backup</button>
         <input type="file" id="f_import" multiple/>
     </div>
     <div id="save_area"></div>
 </div>
-<div id="control">
+<div id="functions" class="container tab_content invisible">
     <div id="kaeru">
         <button id="b_countLetter">count letter</button>
-        <label id="l_countLetterValue">_</label>
-        <label id="l_countLetter">letters</label>
+        <span id="l_countLetterValue">_</span>
+        <span id="l_countLetter">letters</span>
         <button id="b_countRow">count row</button>
-        <label id="l_countRowValue">_</label>
-        <label id="l_countRow">rows</label>
+        <span id="l_countRowValue">_</span>
+        <span id="l_countRow">rows</span>
         </br>
         <button id="b_upper">upper</button>
         <button id="b_lower">lower</button>
@@ -90,56 +98,58 @@
         <button id="b_toCamel">toCamel</button>
         <button id="b_toSnake">toSnake</button>
     </div>
+</div>
+<div id="others" class="container tab_content invisible">
+    <div id="cymbal">
+        <div>
+            <textarea class="ta_cymbal"></textarea>
+            <button class="b_cymbalForward">join-></button>
+        </div>
+        <div>
+            <textarea class="ta_cymbal"></textarea>
+            <button class="b_cymbalForward">join-></button>
+        </div>
+        <div>
+            <textarea class="ta_cymbal"></textarea>
+        </div>
+        <div>
+            <textarea class="ta_cymbal"></textarea>
+            <button class="b_cymbalBack"><-join</button>
+        </div>
+        <div>
+            <textarea class="ta_cymbal"></textarea>
+            <button class="b_cymbalBack"><-join</button>
+        </div>
+    </div>
     <div id="multiReplace">
-        <textarea id="ta_replaceOrg" class="m_horizon"></textarea>
-        <div id="replaceButtons">
+        <textarea id="ta_replaceOrg"></textarea>
+        <div id="replaceButtons" class="m_horizon">
             <button id="b_multiReplace">multi replace</button>
             <br>
             <button id="b_multiReplaceRegex">multi replace(regex)</button>
         </div>
-        <textarea id="ta_replaceDest" class="m_horizon"></textarea>
+        <textarea id="ta_replaceDest"></textarea>
     </div>
     <div id="sequence">
         <input type="text" id="t_seqOrg">
-        <div id="seqStart" class="m_horizon">
+        <div id="seqStart">
             <label id="l_seqStart">start</label>
             <input type="number" id="t_seqStart" value="0">
         </div>
-        <div id="seqStep" class="m_horizon">
+        <div id="seqStep">
             <label id="l_seqStep">step</label>
             <input type="number" id="t_seqStep" value="0">
         </div>
-        <div id="seqLines" class="m_horizon">
+        <div id="seqLines">
             <label id="l_seqLines">lines</label>
             <input type="number" id="t_seqLines" value="1">
         </div>
-        <div id="seqToken" class="m_horizon">
+        <div id="seqToken">
             <label id="l_seqToken">token</label>
             <input type="text" id="t_seqToken" value="#">
         </div>
         <button id="b_sequence">sequence</button>
-        <textarea id="ta_seqResult" class="margin"></textarea>
-    </div>
-    <div id="cymbal">
-        <div class="m_horizon">
-            <textarea class="ta_cymbal"></textarea>
-            <button class="b_cymbalForward">join-></button>
-        </div>
-        <div class="m_horizon">
-            <textarea class="ta_cymbal"></textarea>
-            <button class="b_cymbalForward">join-></button>
-        </div>
-        <div class="m_horizon">
-            <textarea class="ta_cymbal"></textarea>
-        </div>
-        <div class="m_horizon">
-            <textarea class="ta_cymbal"></textarea>
-            <button class="b_cymbalBack"><-join</button>
-        </div>
-        <div class="m_horizon">
-            <textarea class="ta_cymbal"></textarea>
-            <button class="b_cymbalBack"><-join</button>
-        </div>
+        <textarea id="ta_seqResult"></textarea>
     </div>
 </div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
