@@ -236,9 +236,15 @@ function deleteAllAction() {
 }
 
 function switchTabContentAction(event) {
-    var targetIndex = $('.tab_button').index($(event.target));
+    var $tabs = $('.tab_button');
+    var $targetTab = $(event.target);
+    var targetIndex = $tabs.index($targetTab);
+    $.each($tabs, function (idx, tab) {
+        var $tab = $(tab);
+        idx === targetIndex ? $tab.addClass('selected') : $tab.removeClass('selected');
+    });
     $.each($('.tab_content'), function (idx, content) {
-        $obj = $(content);
+        var $obj = $(content);
         idx === targetIndex ? $obj.removeClass('invisible') : $obj.addClass('invisible');
     });
 }

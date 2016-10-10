@@ -27,19 +27,12 @@
 </div>
 <div id="tab_menu" class="container">
     <div id="tab_buttons" class="row">
-        <button class="tab_button four columns selected">storage</button>
-        <button class="tab_button four columns">functions</button>
-        <button class="tab_button four columns">others</button>
+        <div class="tab_button two columns selected">functions</div>
+        <div class="tab_button two columns">storage</div>
+        <div class="tab_button two columns">others</div>
     </div>
 </div>
-<div id="save" class="container tab_content">
-    <div id="backup">
-        <button id="b_backup">backup</button>
-        <input type="file" id="f_import" multiple/>
-    </div>
-    <div id="save_area"></div>
-</div>
-<div id="functions" class="container tab_content invisible">
+<div id="functions" class="tab_content container">
     <div id="kaeru">
         <button id="b_countLetter">count letter</button>
         <span id="l_countLetterValue">_</span>
@@ -99,7 +92,14 @@
         <button id="b_toSnake">toSnake</button>
     </div>
 </div>
-<div id="others" class="container tab_content invisible">
+<div id="save" class="tab_content container invisible">
+    <div id="backup">
+        <button id="b_backup">backup</button>
+        <input type="file" id="f_import" multiple/>
+    </div>
+    <div id="save_area"></div>
+</div>
+<div id="others" class="tab_content container invisible">
     <div id="cymbal">
         <div>
             <textarea class="ta_cymbal"></textarea>
