@@ -49,8 +49,8 @@ button {
 }
 
 textarea {
-    min-height: 36px;
-    min-width: 172px;
+    min-height: 87px;
+    min-width: 280px;
 }
 
 /*div.clearfix:after {*/
@@ -83,8 +83,8 @@ textarea {
     display: block;
 }
 
-#save_area {
-    display: none;
+#save_area button {
+    margin-bottom: 0;
 }
 
 #control > div {

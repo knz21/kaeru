@@ -6,8 +6,8 @@ var localHistory = [];
 var historyIndex = 0;
 var BACKUP_FILE_PREFIX = 'kaeru_backup_';
 var BACKUP_SEPARATOR = '\n\n\n---------------------\n\n\n';
-var MIN_CHILD_HEIGHT = 36;
-var MIN_CHILD_WIDTH = 172;
+var MIN_CHILD_HEIGHT = 72;
+var MIN_CHILD_WIDTH = 256;
 
 (function () {
     bindActions();
