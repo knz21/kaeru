@@ -1,15 +1,43 @@
 body {
-    background-color: #fff;
+    padding: 20px;
+    background-color: #282c34;
 }
 
-button {
+input[type="email"],
+input[type="number"],
+input[type="search"],
+input[type="text"],
+input[type="tel"],
+input[type="url"],
+input[type="password"],
+textarea,
+select {
+    background-color: #fdfeff;
+    color: #666666;
+    margin: 1px;
+}
+
+button,
+.button {
     font-size: 13px;
     text-transform: none;
-    background-color: #ffffff;
+    background-color: #bed1f4;
+    border: none;
+}
+
+button:hover,
+.button:hover {
+    background-color: #b3c5e7;
+}
+
+span,
+label {
+    color: #cccccc;
+    font-weight: normal;
 }
 
 .container {
-    max-width: 99999px;
+    max-width: 1500px;
 }
 
 .tab_button {
@@ -18,32 +46,25 @@ button {
     border-radius: 4px 4px 0 0;
     letter-spacing: .1rem;
     font-weight: 600;
-    color: #cccccc;
+    color: #999999;
     box-sizing: border-box;
     cursor: pointer;
 }
 
 .tab_button.selected {
     border-bottom: none;
-    color: #666666;
-    background-color: #f8f8f8;
+    color: #cccccc;
+    background-color: #555d6d;
 }
 
 .tab_content {
-    border-bottom-left-radius: 4px;
-    border-bottom-right-radius: 4px;
-    background-color: #f8f8f8;
+    border-radius: 4px;
+    background-color: #555d6d;
     padding: 15px;
 }
 
-.m_vertical {
-    margin-bottom: 5px;
-    margin-top: 5px;
-}
-
-.m_horizon {
-    margin-left: 3px;
-    margin-right: 3px;
+.tab_content.first {
+    border-top-left-radius: 0;
 }
 
 .invisible {
@@ -55,21 +76,11 @@ textarea {
     min-width: 195px;
 }
 
-/*div.clearfix:after {*/
-    /*content: ".";*/
-    /*display: block;*/
-    /*visibility: hidden;*/
-    /*height: 0.1px;*/
-    /*font-size: 0.1em;*/
-    /*line-height: 0;*/
-    /*clear: both;*/
-/*}*/
-
 #ta_target {
     width: 99%;
     height: 300px;
     display: block;
-    margin: 5px auto;
+    margin: 0 auto 10px;
 }
 
 .child {
@@ -81,9 +92,14 @@ textarea {
     display: none;
 }
 
+.saveChildSet {
+    margin: 1px;
+}
+
 .saveChildSet button {
     height: 20px;
     padding: 0 15px;
+    margin: 1px;
     line-height: 1;
 }
 
