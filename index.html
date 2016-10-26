@@ -10,18 +10,10 @@
 <body>
 <textarea id="ta_target"></textarea>
 <div id="target_area" class="container">
-    <div class="child row">
-        <button id="b_undo"><-</button>
-        <button id="b_redo">-></button>
+    <div>
         <button id="b_copy">copy</button>
         <button id="b_save">save</button>
         <button id="b_clear">clear</button>
-        <!--<div>-->
-            <!--<input type="text" id="t_message_key"/>-->
-            <!--<br>-->
-            <!--<button id="b_send">send</button>-->
-            <!--<button id="b_receive">receive</button>-->
-        <!--</div>-->
     </div>
 </div>
 <div id="tab_menu" class="container">
@@ -31,8 +23,11 @@
         <div class="tab_button two columns">others</div>
     </div>
 </div>
-<div id="functions" class="tab_content container">
+<div id="functions" class="tab_content container first">
     <div id="kaeru">
+        <button id="b_undo"><-</button>
+        <button id="b_redo">-></button>
+        <br>
         <button id="b_countLetter">count letter</button>
         <span id="l_countLetterValue">_</span>
         <span id="l_countLetter">letters</span>
@@ -92,8 +87,11 @@
     </div>
 </div>
 <div id="save" class="tab_content container invisible">
-    <button id="b_backup">backup</button>
-    <input type="file" id="f_import" multiple/>
+    <button id="b_backup">export</button>
+    <label class="button">
+        import
+        <input type="file" id="f_import" style="display:none;" multiple/>
+    </label>
     <button id="b_deleteAll">delete all</button>
     <div id="save_area"></div>
 </div>
@@ -121,7 +119,7 @@
     </div>
     <div id="multiReplace">
         <textarea id="ta_replaceOrg"></textarea>
-        <div id="replaceButtons" class="m_horizon">
+        <div id="replaceButtons">
             <button id="b_multiReplace">multi replace</button>
             <br>
             <button id="b_multiReplaceRegex">multi replace(regex)</button>
