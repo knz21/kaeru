@@ -923,7 +923,7 @@ function pad(num, digit) {
             return getZero(_digit - i) + (num + '');
         }
     }
-    return num;
+    return num + '';
 }
 
 function getZero(num) {
