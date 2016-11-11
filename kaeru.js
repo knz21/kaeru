@@ -70,6 +70,9 @@ function bindActions() {
     bindWithoutHistory('.b_cymbalBack', cymbalBackAction);
     bindWithoutHistory('#b_backup', backupAction);
     $('#f_import').on('change', importBackup);
+    $target
+        .on('dragover', handleDragOver)
+        .on('drop', handleFileDrop(setTarget));
 }
 
 //firstTime>>
@@ -936,31 +939,59 @@ function getZero(num) {
 
 //Date<<
 
-//import>>
+//file>>
 
 function importBackup(e) {
+    var saved = false;
     for (var i = 0, file; file = e.target.files[i]; i++) {
         if (file.name.indexOf(BACKUP_FILE_PREFIX) !== 0) {
             alert("It's not a kaeru backup file!");
-            return;
-        }
-        if (confirm('Do you import ' + file.name + '?')) {
-            var reader = new FileReader();
-            reader.onload = function () {
-                reader.result.split(BACKUP_SEPARATOR).forEach(function (text) {
-                    if (!isSaved(text)) {
-                        save(text);
+        } else if (confirm('Do you import ' + file.name + '?')) {
+            readFile(file, function (text) {
+                text.split(BACKUP_SEPARATOR).forEach(function (data) {
+                    if (!isSaved(data)) {
+                        save(data);
                     }
                 });
-            };
-            reader.readAsText(file);
+            });
+            saved = true;
         }
     }
-    autoSave($target.val());
-    window.location.reload();
+    if (saved) {
+        autoSave($target.val());
+        window.location.reload();
+    }
 }
 
-//import<<
+function handleDragOver(e) {
+    var _e = e.originalEvent;
+    _e.stopPropagation();
+    _e.preventDefault();
+    _e.dataTransfer.dropEffect = 'copy';
+}
+
+function handleFileDrop(callback) {
+    return function (e) {
+        var _e = e.originalEvent;
+        _e.stopPropagation();
+        _e.preventDefault();
+        readFile(_e.dataTransfer.files[0], function (text) {
+            if ($target.val().length > 0 && confirm('Are you sure to overwrite text?')) {
+                callback(text);
+            }
+        });
+    }
+}
+
+function readFile(file, callback) {
+    var reader = new FileReader();
+    reader.onload = function () {
+        callback(reader.result);
+    };
+    reader.readAsText(file);
+}
+
+//file<<
 
 //random>>
 
