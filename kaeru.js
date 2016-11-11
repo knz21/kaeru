@@ -58,6 +58,7 @@ function bindActions() {
     bind('#b_notIncHead', notIncludeHeadAction);
     bind('#b_notIncAny', notIncludeAnyAction);
     bind('#b_notIncTail', notIncludeTailAction);
+    bind('#b_single_line', singleLineAction);
     bind('#b_break', breakAction);
     bind('#b_order', orderAction);
     bind('#b_lorem', addLoremAction);
@@ -169,11 +170,7 @@ function execBreak(ary, proc) {
 }
 
 function convert(ary) {
-    if (ary.length > 0) {
-        return ary.join('\n');
-    } else {
-        return '';
-    }
+    return ary.join('\n');
 }
 
 function executeModify(proc) {
@@ -567,6 +564,10 @@ function notIncludeTailAction() {
     function notIncludeTailProcess(str, idx, ary) {
         return str.lastIndexOf(val) + val.length !== str.length;
     }
+}
+
+function singleLineAction() {
+    setTarget($target.val().replace(new RegExp('\n', 'g'), ''));
 }
 
 function breakAction() {
