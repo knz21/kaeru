@@ -60,6 +60,7 @@ function bindActions() {
     bind('#b_notIncTail', notIncludeTailAction);
     bind('#b_break', breakAction);
     bind('#b_order', orderAction);
+    bind('#b_lorem', addLoremAction);
     bind('#b_toCamel', toCamelAction);
     bind('#b_toSnake', toSnakeAction);
     bind('#b_multiReplace', multiReplaceAction);
@@ -607,6 +608,10 @@ function orderAction() {
         }
         return space;
     }
+}
+
+function addLoremAction() {
+    $target.val($target.val() + 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.');
 }
 
 function toCamelAction() {
