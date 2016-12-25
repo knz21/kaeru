@@ -12,6 +12,7 @@ var MIN_CHILD_WIDTH = 160;
 (function () {
     bindActions();
     setCopyButton();
+    setFirebaseStorageUploader();
     loadLocalStorage();
     startAutoSave();
 })();
@@ -21,7 +22,8 @@ function bindActions() {
     bindWithoutHistory('#b_redo', redoAction);
     bindWithoutHistory('#b_save', saveAction);
     bind('#b_clear', clearAction);
-    bind('#b_deleteAll', deleteAllAction);
+    bindWithoutHistory('#b_deleteAll', deleteAllAction);
+    bindWithoutHistory('#b_fileStorage', showFileStorageAction);
     bindWithoutHistory('.tab_button', switchTabContentAction);
     //bindWithoutHistory('#b_send', sendAction);
     //bind('#b_receive', receiveAction);
@@ -110,6 +112,42 @@ function setSaveHistory(func) {
 
 function setCopyButton() {
     setCopy($('#b_copy'), $target);
+}
+
+function setFirebaseStorageUploader() {
+    var $wrapper = $('#file_storage_wrapper');
+    $wrapper.on('click', function () {
+        $wrapper.hide();
+    });
+    var $fileStorage = $('#file_storage');
+    $fileStorage.on('click', function (e) {
+        e.stopPropagation();
+    });
+    var $uploader = $('#firebase_storage_progress');
+    var $uploadButton = $('#b_firebase_storage_upload');
+    $uploadButton.on('change', function (e) {
+        $uploader.val(0);
+        var file = e.target.files[0];
+        if (!confirm('upload file: ' + file.name)) {
+            $uploadButton.val('');
+            return;
+        }
+        var storageRef = firebase.storage().ref('kaeru_uploads/' + file.name);
+        var task = storageRef.put(file);
+        task.on('state_changed',
+            function (snapshot) {
+                var percentage = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                $uploader.val(percentage);
+                console.log(percentage);
+            },
+            function (err) {
+                console.log(err);
+            },
+            function complete() {
+                console.log('complete');
+                $uploadButton.val('');
+            });
+    });
 }
 
 function loadLocalStorage() {
@@ -234,6 +272,10 @@ function deleteAllAction() {
         $all.remove();
         $('#b_deleteAll').hide();
     }
+}
+
+function showFileStorageAction() {
+    $('#file_storage_wrapper').show();
 }
 
 function switchTabContentAction(event) {

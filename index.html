@@ -97,6 +97,7 @@
         <input type="file" id="f_import" style="display:none;" multiple/>
     </label>
     <button id="b_deleteAll">delete all</button>
+    <button id="b_fileStorage">file</button>
     <div id="save_area"></div>
 </div>
 <div id="others" class="tab_content container invisible">
@@ -152,6 +153,24 @@
         <textarea id="ta_seqResult"></textarea>
     </div>
 </div>
+<div id="file_storage_wrapper">
+    <div id="file_storage" class="container">
+        <progress value="0" max="100" id="firebase_storage_progress">0%</progress>
+        <input type="file" value="firebase_storage_upload" id="b_firebase_storage_upload"/>
+    </div>
+</div>
+<script src="https://www.gstatic.com/firebasejs/3.6.4/firebase.js"></script>
+<script>
+    // Initialize Firebase
+    var config = {
+        apiKey: '',
+        authDomain: '',
+        databaseURL: '',
+        storageBucket: '',
+        messagingSenderId: ''
+    };
+    firebase.initializeApp(config);
+</script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/zeroclipboard/2.2.0/ZeroClipboard.min.js"></script>
 <script src="kaeru.js"></script>
