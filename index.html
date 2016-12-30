@@ -94,7 +94,7 @@
     <button id="b_backup">export</button>
     <label class="button">
         import
-        <input type="file" id="f_import" style="display:none;" multiple/>
+        <input type="file" id="f_import" class="invisible" multiple/>
     </label>
     <button id="b_deleteAll">delete all</button>
     <button id="b_fileStorage">file</button>
@@ -155,8 +155,15 @@
 </div>
 <div id="file_storage_wrapper">
     <div id="file_storage" class="container">
+        <label class="button button-border">
+            upload
+            <input type="file" value="firebase_storage_upload" id="b_firebase_storage_upload" class="invisible"/>
+        </label>
+        <br>
         <progress value="0" max="100" id="firebase_storage_progress">0%</progress>
-        <input type="file" value="firebase_storage_upload" id="b_firebase_storage_upload"/>
+        <div id="firebase_loader_wrapper">
+            <div id="firebase_loader"></div>
+        </div>
         <div id="download_files"></div>
     </div>
 </div>

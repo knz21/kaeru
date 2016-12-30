@@ -120,32 +120,33 @@ function setFirebaseStorageUploader() {
     $wrapper.on('click', function () {
         $wrapper.hide();
     });
-    var $fileStorage = $('#file_storage');
-    $fileStorage.on('click', function (e) {
+    $('#file_storage').on('click', function (e) {
         e.stopPropagation();
     });
-    var $uploader = $('#firebase_storage_progress');
-    var $uploadButton = $('#b_firebase_storage_upload');
-    $uploadButton.on('change', function (e) {
+    setUploader($('#firebase_storage_progress'), $('#b_firebase_storage_upload'));
+}
+
+function setUploader(progress, uploader) {
+    uploader.on('change', function (e) {
         var file = e.target.files[0];
         if (!confirm('upload file: ' + file.name)) {
-            $uploadButton.val('');
+            uploader.val('');
             return;
         }
-        saveStoragePath(file.name);
         var storageRef = firebase.storage().ref(FIREBASE_BUCKET + '/' + file.name);
         var task = storageRef.put(file);
         task.on('state_changed',
             function (snapshot) {
                 var percentage = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                $uploader.val(percentage);
+                progress.val(percentage);
             },
             function (err) {
                 console.log(err);
             },
             function complete() {
-                $uploadButton.val('');
-                $uploader.val(0);
+                uploader.val('');
+                progress.val(0);
+                saveStoragePath(file.name);
             });
     });
 }
@@ -284,25 +285,28 @@ function showFileStorageAction() {
 }
 
 function showDownloadLink() {
+    var $fileArea = $('#download_files');
+    $('#firebase_loader').show();
+    $fileArea.children().remove();
     firebase.database().ref(FIREBASE_BUCKET + '/filenames').once('value').then(function (snapshot) {
         var filenames = snapshot.val();
-        var $fileList = $('#download_files');
-        Object.keys(filenames).forEach(function (key) {
-            console.log(filenames[key]);
-            appendDownloadLink($fileList, filenames[key]);
-        });
+        var keys = Object.keys(filenames);
+        for (var i = 0, c = keys.length; i < c; i++) {
+            appendDownloadLink($fileArea, filenames[keys[i]]);
+        }
     });
 }
 
-function appendDownloadLink($files, fileName) {
+function appendDownloadLink($fileArea, fileName) {
     firebase.storage().ref(FIREBASE_BUCKET + '/' + fileName).getDownloadURL().then(function (url) {
-        $files.append(createDownloadLink(url, fileName));
-        $files.append('<br>');
+        $fileArea.append(createDownloadLink(url, fileName));
+        $fileArea.append('<br>');
+            $('#firebase_loader').hide();
     });
 }
 
 function createDownloadLink(url, fileName) {
-    return $('<a>').attr('download', fileName).attr('href', url).text(fileName);
+    return $('<a>').attr({ download: fileName, href: url }).text(fileName);
 }
 
 function switchTabContentAction(event) {
