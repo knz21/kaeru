@@ -145,6 +145,7 @@ function setUploader(progress, uploader) {
                 console.log(err);
             },
             function complete() {
+                alert('Finish uploading!');
                 uploader.val('');
                 progress.val(0);
                 saveStoragePath(file.name);
