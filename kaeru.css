@@ -111,10 +111,6 @@ textarea {
     margin-bottom: 0;
 }
 
-#control > div {
-    float: left;
-}
-
 #multiReplace textarea {
     width: 200px;
     height: 100px;
