@@ -8,10 +8,13 @@ var BACKUP_FILE_PREFIX = 'kaeru_backup_';
 var BACKUP_SEPARATOR = '\n\n\n---------------------\n\n\n';
 var MIN_CHILD_HEIGHT = 72;
 var MIN_CHILD_WIDTH = 160;
+var FIREBASE_BUCKET = 'kaeru_uploads';
+var FIREBASE_TEXT = 'kaeru_text';
 
 (function () {
     bindActions();
     setCopyButton();
+    setFirebaseStorageUploader();
     loadLocalStorage();
     startAutoSave();
 })();
@@ -21,10 +24,11 @@ function bindActions() {
     bindWithoutHistory('#b_redo', redoAction);
     bindWithoutHistory('#b_save', saveAction);
     bind('#b_clear', clearAction);
-    bind('#b_deleteAll', deleteAllAction);
+    bindWithoutHistory('#b_deleteAll', deleteAllAction);
+    bindWithoutHistory('#b_fileStorage', showFileStorageAction);
+    bindWithoutHistory('#b_text_send', sendTextAction);
+    bind('#b_text_receive', receiveTextAction);
     bindWithoutHistory('.tab_button', switchTabContentAction);
-    //bindWithoutHistory('#b_send', sendAction);
-    //bind('#b_receive', receiveAction);
     var $saveArea = $('#save_area');
     $saveArea.on('click', '.b_saveChild', childSaveAction);
     $saveArea.on('click', '.b_deleteChild', childDeleteAction);
@@ -110,6 +114,46 @@ function setSaveHistory(func) {
 
 function setCopyButton() {
     setCopy($('#b_copy'), $target);
+}
+
+function setFirebaseStorageUploader() {
+    var $wrapper = $('#file_storage_wrapper');
+    $wrapper.on('click', function () {
+        $wrapper.hide();
+    });
+    $('#file_storage').on('click', function (e) {
+        e.stopPropagation();
+    });
+    setUploader($('#firebase_storage_progress'), $('#b_firebase_storage_upload'));
+}
+
+function setUploader(progress, uploader) {
+    uploader.on('change', function (e) {
+        var file = e.target.files[0];
+        if (!confirm('upload file: ' + file.name)) {
+            uploader.val('');
+            return;
+        }
+        var storageRef = firebase.storage().ref(FIREBASE_BUCKET + '/' + file.name);
+        var task = storageRef.put(file);
+        task.on('state_changed',
+            function (snapshot) {
+                var percentage = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                progress.val(percentage);
+            },
+            function (err) {
+                console.log(err);
+            },
+            function complete() {
+                uploader.val('');
+                progress.val(0);
+                saveStoragePath(file.name);
+            });
+    });
+}
+
+function saveStoragePath(fileName) {
+    firebase.database().ref(FIREBASE_BUCKET).child('filenames').push(fileName);
 }
 
 function loadLocalStorage() {
@@ -236,6 +280,27 @@ function deleteAllAction() {
     }
 }
 
+function showFileStorageAction() {
+    $('#file_storage_wrapper').show();
+    showDownloadLink();
+}
+
+function sendTextAction() {
+    firebase.database().ref(FIREBASE_TEXT).set({
+        message: $target.val()
+    });
+    alert('Finish sending!');
+}
+
+function receiveTextAction() {
+    firebase.database().ref(FIREBASE_TEXT).once('value').then(function (snapshot) {
+        if ($target.val().length > 0 && !window.confirm('Are you sure to overwrite text?')) {
+            return;
+        }
+        $target.val(snapshot.val().message);
+    });
+}
+
 function switchTabContentAction(event) {
     var $tabs = $('.tab_button');
     var $targetTab = $(event.target);
@@ -248,59 +313,6 @@ function switchTabContentAction(event) {
         var $obj = $(content);
         idx === targetIndex ? $obj.removeClass('invisible') : $obj.addClass('invisible');
     });
-}
-
-function sendAction() {//TODO
-    //var key = $('#t_message_key').val();
-    //if (key.length == 0 || $target.val().length == 0) {
-    //    return;
-    //}
-    //$.ajax({
-    //        url: 'php/send_message.php',
-    //        type: 'post',
-    //        dataType: 'text',
-    //        data: {
-    //            key: key,
-    //            text: $target.val()
-    //        }
-    //    })
-    //    .done(function () {
-    //        alert('finish sending!');
-    //    })
-    //    .fail(function (error) {
-    //        if (error && error.responseText) {
-    //            alert(error.responseText);
-    //        }
-    //    });
-}
-
-function receiveAction() {//TODO
-    //var key = $('#t_message_key').val();
-    //if (key.length == 0) {
-    //    return;
-    //}
-    //if ($target.val().length > 0 && !window.confirm('Are you sure to overwrite text?')) {
-    //    return;
-    //}
-    //$.ajax({
-    //        url: 'php/receive_message.php',
-    //        type: 'post',
-    //        dataType: 'text',
-    //        data: {
-    //            key: key
-    //        }
-    //    })
-    //    .done(function (text) {
-    //        if (text) {
-    //            $target.val(text);
-    //            window.scrollTo(0, 0);
-    //        }
-    //    })
-    //    .fail(function (error) {
-    //        if (error && error.responseText) {
-    //            alert(error.responseText);
-    //        }
-    //    });
 }
 
 function childSaveAction(event) {
@@ -842,6 +854,31 @@ function downloadFile(filename, content) {
 function changeSize($target, height, width) {
     $target.height(height);
     $target.width(width);
+}
+
+function showDownloadLink() {
+    var $fileArea = $('#download_files');
+    $('#firebase_loader').show();
+    $fileArea.children().remove();
+    firebase.database().ref(FIREBASE_BUCKET + '/filenames').once('value').then(function (snapshot) {
+        var filenames = snapshot.val();
+        var keys = Object.keys(filenames);
+        for (var i = 0, c = keys.length; i < c; i++) {
+            appendDownloadLink($fileArea, filenames[keys[i]]);
+        }
+    });
+}
+
+function appendDownloadLink($fileArea, fileName) {
+    firebase.storage().ref(FIREBASE_BUCKET + '/' + fileName).getDownloadURL().then(function (url) {
+        $fileArea.append(createDownloadLink(url, fileName));
+        $fileArea.append('<br>');
+        $('#firebase_loader').hide();
+    });
+}
+
+function createDownloadLink(url, fileName) {
+    return $('<a>').attr({ download: fileName, href: url }).text(fileName);
 }
 
 //localStorage>>
