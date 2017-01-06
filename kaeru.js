@@ -261,7 +261,7 @@ function saveAction() {
         }
     }
     var val = $target.val();
-    getNewSaveChild(save(val), val).appendTo('#save_area');
+    getNewSaveChild(save(val), val).prependTo('#save_area');
     setChildCopyAction();
     $('#b_deleteAll').show();
 }
@@ -885,14 +885,21 @@ function createDownloadLink(url, fileName) {
 //localStorage>>
 
 function load() {
+    var keys = [];
     for (var i = 0, cnt = localStorage.length; i < cnt; i++) {
         var key = localStorage.key(i);
         if (key.indexOf(KEY_PREFIX_SAVE) === 0) {
-            var child = getNewSaveChild(key, localStorage.getItem(key));
-            child.appendTo('#save_area');
-            setCopy(child.find('.b_copyChild'), child.find('.ta_saveChild'));
-            $('#b_deleteAll').show();
+            keys.push(key);
         }
+    }
+    keys = execSort(keys, false);
+    keys.forEach(function (key) {
+        var child = getNewSaveChild(key, localStorage.getItem(key));
+        child.appendTo('#save_area');
+        setCopy(child.find('.b_copyChild'), child.find('.ta_saveChild'));
+    });
+    if (keys.length > 0) {
+        $('#b_deleteAll').show();
     }
     if ($target.val() === '') {
         $target.val(localStorage.getItem(KEY_AUTO_SAVE));
