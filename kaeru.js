@@ -10,10 +10,13 @@ var MIN_CHILD_HEIGHT = 72;
 var MIN_CHILD_WIDTH = 160;
 var FIREBASE_BUCKET = 'kaeru_uploads';
 var FIREBASE_TEXT = 'kaeru_text';
+var actionsOnSelectedTab = [];
 
 (function () {
     bindActions();
+    bindActionOnSelectTab();
     setCopyButton();
+    // auth();
     setFirebaseStorageUploader();
     loadLocalStorage();
     startAutoSave();
@@ -25,7 +28,6 @@ function bindActions() {
     bindWithoutHistory('#b_save', saveAction);
     bind('#b_clear', clearAction);
     bindWithoutHistory('#b_deleteAll', deleteAllAction);
-    bindWithoutHistory('#b_fileStorage', showFileStorageAction);
     bindWithoutHistory('#b_text_send', sendTextAction);
     bind('#b_text_receive', receiveTextAction);
     bindWithoutHistory('.tab_button', switchTabContentAction);
@@ -112,18 +114,48 @@ function setSaveHistory(func) {
     }
 }
 
+function bindActionOnSelectTab() {
+    var idx = 0;
+    actionsOnSelectedTab[idx++] = onFunctionsSelected;
+    actionsOnSelectedTab[idx++] = onLocalSelected;
+    actionsOnSelectedTab[idx++] = onRemoteSelected;
+    actionsOnSelectedTab[idx++] = onOthersSelected;
+}
+
 function setCopyButton() {
     setCopy($('#b_copy'), $target);
 }
 
+function auth() {
+    var provider = new firebase.auth.GoogleAuthProvider();
+    firebase.auth().signInWithPopup(provider).then(function(result) {
+        console.log(result);
+        // This gives you a Google Access Token. You can use it to access the Google API.
+        var token = result.credential.accessToken;
+        // The signed-in user info.
+        var user = result.user;
+        // ...
+    }).catch(function(error) {
+        console.log(error);
+        // Handle Errors here.
+        var errorCode = error.code;
+        var errorMessage = error.message;
+        // The email of the user's account used.
+        var email = error.email;
+        // The firebase.auth.AuthCredential type that was used.
+        var credential = error.credential;
+        // ...
+    });
+}
+
 function setFirebaseStorageUploader() {
-    var $wrapper = $('#file_storage_wrapper');
-    $wrapper.on('click', function () {
-        $wrapper.hide();
-    });
-    $('#file_storage').on('click', function (e) {
-        e.stopPropagation();
-    });
+    // var $wrapper = $('#file_storage_wrapper');
+    // $wrapper.on('click', function () {
+    //     $wrapper.hide();
+    // });
+    // $('#file_storage').on('click', function (e) {
+    //     e.stopPropagation();
+    // });
     setUploader($('#firebase_storage_progress'), $('#b_firebase_storage_upload'));
 }
 
@@ -136,6 +168,8 @@ function setUploader(progress, uploader) {
         }
         var storageRef = firebase.storage().ref(FIREBASE_BUCKET + '/' + file.name);
         var task = storageRef.put(file);
+        progress.val(0);
+        progress.show();
         task.on('state_changed',
             function (snapshot) {
                 var percentage = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
@@ -147,7 +181,7 @@ function setUploader(progress, uploader) {
             function complete() {
                 alert('Finish uploading!');
                 uploader.val('');
-                progress.val(0);
+                progress.hide();
                 saveStoragePath(file.name);
             });
     });
@@ -281,11 +315,6 @@ function deleteAllAction() {
     }
 }
 
-function showFileStorageAction() {
-    $('#file_storage_wrapper').show();
-    showDownloadLink();
-}
-
 function sendTextAction() {
     firebase.database().ref(FIREBASE_TEXT).set({
         message: $target.val()
@@ -314,6 +343,10 @@ function switchTabContentAction(event) {
         var $obj = $(content);
         idx === targetIndex ? $obj.removeClass('invisible') : $obj.addClass('invisible');
     });
+    var onSelectedTab = actionsOnSelectedTab[targetIndex];
+    if (onSelectedTab) {
+        onSelectedTab();
+    }
 }
 
 function childSaveAction(event) {
@@ -704,6 +737,24 @@ function backupAction() {
 }
 
 //Actions<<
+
+//Actions On Selected Tab>>
+
+function onFunctionsSelected() {
+}
+
+function onLocalSelected() {
+}
+
+function onRemoteSelected() {
+    // auth();
+    showDownloadLink();
+}
+
+function onOthersSelected() {
+}
+
+//Actions On Selected Tab<<
 
 function setCopy($copyBtn, $targetTa) {
     var $btnCopy = $copyBtn.get(0);
