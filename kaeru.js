@@ -11,12 +11,13 @@ var MIN_CHILD_WIDTH = 160;
 var FIREBASE_BUCKET = 'kaeru_uploads';
 var FIREBASE_TEXT = 'kaeru_text';
 var actionsOnSelectedTab = [];
+var fileNamesRef;
 
 (function () {
     bindActions();
     bindActionOnSelectTab();
     setCopyButton();
-    // auth();
+    // firebaseAuth();
     setFirebaseStorageUploader();
     loadLocalStorage();
     startAutoSave();
@@ -126,28 +127,6 @@ function setCopyButton() {
     setCopy($('#b_copy'), $target);
 }
 
-function auth() {
-    var provider = new firebase.auth.GoogleAuthProvider();
-    firebase.auth().signInWithPopup(provider).then(function(result) {
-        console.log(result);
-        // This gives you a Google Access Token. You can use it to access the Google API.
-        var token = result.credential.accessToken;
-        // The signed-in user info.
-        var user = result.user;
-        // ...
-    }).catch(function(error) {
-        console.log(error);
-        // Handle Errors here.
-        var errorCode = error.code;
-        var errorMessage = error.message;
-        // The email of the user's account used.
-        var email = error.email;
-        // The firebase.auth.AuthCredential type that was used.
-        var credential = error.credential;
-        // ...
-    });
-}
-
 function setFirebaseStorageUploader() {
     // var $wrapper = $('#file_storage_wrapper');
     // $wrapper.on('click', function () {
@@ -166,7 +145,12 @@ function setUploader(progress, uploader) {
             uploader.val('');
             return;
         }
-        var storageRef = firebase.storage().ref(FIREBASE_BUCKET + '/' + file.name);
+        var user = firebase.auth().currentUser;
+        if (user == null) {
+            alert('No user!');
+            return;
+        }
+        var storageRef = firebase.storage().ref(FIREBASE_BUCKET + '/' + user.uid + '/' + file.name);
         var task = storageRef.put(file);
         progress.val(0);
         progress.show();
@@ -177,18 +161,21 @@ function setUploader(progress, uploader) {
             },
             function (err) {
                 console.log(err);
+                alert('Error!');
+                uploader.val('');
+                progress.hide();
             },
             function complete() {
                 alert('Finish uploading!');
                 uploader.val('');
                 progress.hide();
-                saveStoragePath(file.name);
+                saveStoragePath(user.uid, file.name);
             });
     });
 }
 
-function saveStoragePath(fileName) {
-    firebase.database().ref(FIREBASE_BUCKET).child('filenames').push(fileName);
+function saveStoragePath(uid, fileName) {
+    firebase.database().ref(FIREBASE_BUCKET + '/filenames/' + uid).push(fileName);
 }
 
 function loadLocalStorage() {
@@ -747,8 +734,11 @@ function onLocalSelected() {
 }
 
 function onRemoteSelected() {
-    // auth();
-    showDownloadLink();
+    firebaseAuth(function (uid) {
+        setFileNameListener(uid, function (fileNames) {
+            renderDownloadLinks(uid, fileNames);
+        });
+    });
 }
 
 function onOthersSelected() {
@@ -908,25 +898,26 @@ function changeSize($target, height, width) {
     $target.width(width);
 }
 
-function showDownloadLink() {
-    var $fileArea = $('#download_files');
-    $('#firebase_loader').show();
-    $fileArea.children().remove();
-    firebase.database().ref(FIREBASE_BUCKET + '/filenames').once('value').then(function (snapshot) {
-        var filenames = snapshot.val();
-        var keys = Object.keys(filenames);
-        for (var i = 0, c = keys.length; i < c; i++) {
-            appendDownloadLink($fileArea, filenames[keys[i]]);
-        }
+function renderDownloadLinks(uid, fileNames) {
+    var $loader = $('#firebase_loader');
+    if (fileNames == null) {
+        $loader.hide();
+        return;
+    }
+    var keys = Object.keys(fileNames);
+    keys.forEach(function (key) {
+        var fileName = fileNames[key];
+        var $fileArea = $('#download_files');
+        firebase.storage().ref(FIREBASE_BUCKET + '/' + uid + '/' + fileName).getDownloadURL().then(function (url) {
+            $fileArea.append(createDownloadLink(url, fileName));
+            $fileArea.append('<br>');
+            $loader.hide();
+        });
     });
 }
 
-function appendDownloadLink($fileArea, fileName) {
-    firebase.storage().ref(FIREBASE_BUCKET + '/' + fileName).getDownloadURL().then(function (url) {
-        $fileArea.append(createDownloadLink(url, fileName));
-        $fileArea.append('<br>');
-        $('#firebase_loader').hide();
-    });
+function appendDownliadLink($fileArea, url, fileName) {
+
 }
 
 function createDownloadLink(url, fileName) {
@@ -1109,3 +1100,45 @@ function randomStr(length, hasNum, hasLowAlp, hasUprAlp) {
 }
 
 //random<<
+
+//firebase>>
+
+function firebaseAuth(callback) {
+    var user = firebase.auth().currentUser;
+    if (user != null && user.uid) {
+        callback(user.uid);
+        return;
+    }
+    var provider = new firebase.auth.GoogleAuthProvider();
+    firebase.auth().signInWithPopup(provider).then(function(result) {
+        console.log(result);
+        // This gives you a Google Access Token. You can use it to access the Google API.
+        var token = result.credential.accessToken;
+        // The signed-in user info.
+        var user = result.user;
+        console.log(user.uid);
+        callback(user.uid);
+        // ...
+    }).catch(function(error) {
+        console.log(error);
+        // Handle Errors here.
+        var errorCode = error.code;
+        var errorMessage = error.message;
+        // The email of the user's account used.
+        var email = error.email;
+        // The firebase.firebaseAuth.AuthCredential type that was used.
+        var credential = error.credential;
+        // ...
+    });
+}
+
+function setFileNameListener(uid, callback) {
+    if (!fileNamesRef) {
+        fileNamesRef = firebase.database().ref(FIREBASE_BUCKET + '/filenames/' + uid);
+        fileNamesRef.on('value', function (snapshot) {
+            callback(snapshot.val());
+        });
+    }
+}
+
+//firebase<<
