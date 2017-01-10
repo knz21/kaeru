@@ -18,7 +18,6 @@ var fileNamesRef;
     bindActions();
     bindActionOnSelectTab();
     setCopyButton();
-    setFirebaseStorageUploader();
     loadLocalStorage();
     startAutoSave();
 })();
@@ -79,9 +78,8 @@ function bindActions() {
     bindWithoutHistory('.b_cymbalBack', cymbalBackAction);
     bindWithoutHistory('#b_backup', backupAction);
     $('#f_import').on('change', importBackup);
-    $target
-        .on('dragover', handleDragOver)
-        .on('drop', handleFileDrop(setTarget));
+    $('#b_firebase_storage_upload').on('change', uploadToFirebaseStorage);
+    $target.on('dragover', handleDragOver).on('drop', handleFileDrop(setTarget));
 }
 
 //firstTime>>
@@ -126,10 +124,6 @@ function bindActionOnSelectTab() {
 
 function setCopyButton() {
     setCopy($('#b_copy'), $target);
-}
-
-function setFirebaseStorageUploader() {
-    setUploader($('#firebase_storage_progress'), $('#b_firebase_storage_upload'));
 }
 
 function loadLocalStorage() {
@@ -713,40 +707,6 @@ function setCopy($copyBtn, $targetTa) {
     });
 }
 
-function setUploader(progress, uploader) {
-    uploader.on('change', function (e) {
-        var file = e.target.files[0];
-        if (!confirm('uploadFile file: ' + file.name)) {
-            uploader.val('');
-            return;
-        }
-        var user = getCurrentFirebaseUser();
-        if (user == null) {
-            alert('No user!');
-            return;
-        }
-        progress.val(0);
-        progress.show();
-        uploadFile(file, user.uid,
-            function (snapshot) {
-                var percentage = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                progress.val(percentage);
-            },
-            function (err) {
-                console.log(err);
-                alert('Error!');
-                uploader.val('');
-                progress.hide();
-            },
-            function complete() {
-                alert('Finish uploading!');
-                uploader.val('');
-                progress.hide();
-                saveFileName(user.uid, file.name);
-            });
-    });
-}
-
 function getNewSaveChild(key, val) {
     return $('<div>').attr({ class: 'child saveChildSet margin' })
         .append($('<button>').attr({ class: 'b_saveChild' }).text('^v'))
@@ -897,8 +857,10 @@ function renderDownloadLinks(uid, fileNames) {
         $loader.hide();
         return;
     }
+    $loader.show();
     var keys = Object.keys(fileNames);
     var $fileArea = $('#download_files');
+    $fileArea.children().remove();
     keys.forEach(function (key) {
         var fileName = fileNames[key];
         getDownloadUrl(uid, fileName, function (url) {
@@ -1066,6 +1028,37 @@ function readFile(file, callback) {
         callback(reader.result);
     };
     reader.readAsText(file);
+}
+
+function uploadToFirebaseStorage(e) {
+    var file = e.target.files[0];
+    if (!confirm('uploadFile file: ' + file.name)) {
+        return;
+    }
+    var user = getCurrentFirebaseUser();
+    if (user == null) {
+        alert('No user!');
+        return;
+    }
+    var progress = $('#firebase_storage_progress');
+    progress.val(0);
+    progress.show();
+    uploadFile(file, user.uid,
+        function (snapshot) {
+            var percentage = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            progress.val(percentage);
+        },
+        function (err) {
+            console.log(err);
+            alert('Error!');
+            progress.hide();
+        },
+        function complete() {
+            progress.val(100);
+            alert('Finish uploading!');
+            progress.hide();
+            saveFileName(user.uid, file.name);
+        });
 }
 
 //file<<
