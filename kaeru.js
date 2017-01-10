@@ -13,6 +13,7 @@ var FIREBASE_FILE_NAME_PATH = FIREBASE_BUCKET + '/filenames/';
 var FIREBASE_TEXT = 'kaeru_text';
 var actionsOnSelectedTab = [];
 var fileNamesRef;
+var fileNameList = [];
 
 (function () {
     bindActions();
@@ -689,7 +690,8 @@ function onLocalSelected() {
 function onRemoteSelected() {
     firebaseAuth(function (uid) {
         setFileNameListener(uid, function (fileNames) {
-            renderDownloadLinks(uid, fileNames);
+            setFileNameList(fileNames);
+            renderDownloadLinks(uid);
         });
     });
 }
@@ -851,18 +853,23 @@ function changeSize($target, height, width) {
     $target.width(width);
 }
 
-function renderDownloadLinks(uid, fileNames) {
-    var $loader = $('#firebase_loader');
+function setFileNameList(fileNames) {
     if (fileNames == null) {
-        $loader.hide();
+        fileNameList = [];
         return;
     }
-    $loader.show();
     var keys = Object.keys(fileNames);
+    fileNameList = keys.map(function (key) {
+        return fileNames[key];
+    });
+}
+
+function renderDownloadLinks(uid) {
+    var $loader = $('#firebase_loader');
+    $loader.show();
     var $fileArea = $('#download_files');
     $fileArea.children().remove();
-    keys.forEach(function (key) {
-        var fileName = fileNames[key];
+    fileNameList.forEach(function (fileName) {
         getDownloadUrl(uid, fileName, function (url) {
             $fileArea.append(createDownloadLink(url, fileName));
             $fileArea.append('<br>');
@@ -1032,7 +1039,8 @@ function readFile(file, callback) {
 
 function uploadToFirebaseStorage(e) {
     var file = e.target.files[0];
-    if (!confirm('uploadFile file: ' + file.name)) {
+    var isOverwrite = fileNameList.includes(file.name);
+    if (isOverwrite && !confirm('Are you sure to overwrite file?: ' + file.name)) {
         return;
     }
     var user = getCurrentFirebaseUser();
@@ -1057,7 +1065,9 @@ function uploadToFirebaseStorage(e) {
             progress.val(100);
             alert('Finish uploading!');
             progress.hide();
-            saveFileName(user.uid, file.name);
+            if (!isOverwrite) {
+                saveFileName(user.uid, file.name);
+            }
         });
 }
 
