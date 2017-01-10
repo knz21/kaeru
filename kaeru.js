@@ -9,6 +9,7 @@ var BACKUP_SEPARATOR = '\n\n\n---------------------\n\n\n';
 var MIN_CHILD_HEIGHT = 72;
 var MIN_CHILD_WIDTH = 160;
 var FIREBASE_BUCKET = 'kaeru_uploads';
+var FIREBASE_FILE_NAME_PATH = FIREBASE_BUCKET + '/filenames/';
 var FIREBASE_TEXT = 'kaeru_text';
 var actionsOnSelectedTab = [];
 var fileNamesRef;
@@ -17,7 +18,6 @@ var fileNamesRef;
     bindActions();
     bindActionOnSelectTab();
     setCopyButton();
-    // firebaseAuth();
     setFirebaseStorageUploader();
     loadLocalStorage();
     startAutoSave();
@@ -31,6 +31,7 @@ function bindActions() {
     bindWithoutHistory('#b_deleteAll', deleteAllAction);
     bindWithoutHistory('#b_text_send', sendTextAction);
     bind('#b_text_receive', receiveTextAction);
+    bindWithoutHistory('#a_logout_firebase', logoutFirebaseAction);
     bindWithoutHistory('.tab_button', switchTabContentAction);
     var $saveArea = $('#save_area');
     $saveArea.on('click', '.b_saveChild', childSaveAction);
@@ -120,7 +121,7 @@ function bindActionOnSelectTab() {
     actionsOnSelectedTab[idx++] = onFunctionsSelected;
     actionsOnSelectedTab[idx++] = onLocalSelected;
     actionsOnSelectedTab[idx++] = onRemoteSelected;
-    actionsOnSelectedTab[idx++] = onOthersSelected;
+    actionsOnSelectedTab[idx] = onOthersSelected;
 }
 
 function setCopyButton() {
@@ -128,54 +129,7 @@ function setCopyButton() {
 }
 
 function setFirebaseStorageUploader() {
-    // var $wrapper = $('#file_storage_wrapper');
-    // $wrapper.on('click', function () {
-    //     $wrapper.hide();
-    // });
-    // $('#file_storage').on('click', function (e) {
-    //     e.stopPropagation();
-    // });
     setUploader($('#firebase_storage_progress'), $('#b_firebase_storage_upload'));
-}
-
-function setUploader(progress, uploader) {
-    uploader.on('change', function (e) {
-        var file = e.target.files[0];
-        if (!confirm('upload file: ' + file.name)) {
-            uploader.val('');
-            return;
-        }
-        var user = firebase.auth().currentUser;
-        if (user == null) {
-            alert('No user!');
-            return;
-        }
-        var storageRef = firebase.storage().ref(FIREBASE_BUCKET + '/' + user.uid + '/' + file.name);
-        var task = storageRef.put(file);
-        progress.val(0);
-        progress.show();
-        task.on('state_changed',
-            function (snapshot) {
-                var percentage = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                progress.val(percentage);
-            },
-            function (err) {
-                console.log(err);
-                alert('Error!');
-                uploader.val('');
-                progress.hide();
-            },
-            function complete() {
-                alert('Finish uploading!');
-                uploader.val('');
-                progress.hide();
-                saveStoragePath(user.uid, file.name);
-            });
-    });
-}
-
-function saveStoragePath(uid, fileName) {
-    firebase.database().ref(FIREBASE_BUCKET + '/filenames/' + uid).push(fileName);
 }
 
 function loadLocalStorage() {
@@ -303,19 +257,24 @@ function deleteAllAction() {
 }
 
 function sendTextAction() {
-    firebase.database().ref(FIREBASE_TEXT).set({
-        message: $target.val()
-    });
+    sendTextMessage($target.val());
     alert('Finish sending!');
 }
 
 function receiveTextAction() {
-    firebase.database().ref(FIREBASE_TEXT).once('value').then(function (snapshot) {
+    receiveTextMessage(function (text) {
         if ($target.val().length > 0 && !window.confirm('Are you sure to overwrite text?')) {
             return;
         }
-        $target.val(snapshot.val().message);
+        $target.val(text);
     });
+}
+
+function logoutFirebaseAction() {
+    if (confirm('Logout?')) {
+        logoutFirebase();
+        $('#local').click();
+    }
 }
 
 function switchTabContentAction(event) {
@@ -754,6 +713,40 @@ function setCopy($copyBtn, $targetTa) {
     });
 }
 
+function setUploader(progress, uploader) {
+    uploader.on('change', function (e) {
+        var file = e.target.files[0];
+        if (!confirm('uploadFile file: ' + file.name)) {
+            uploader.val('');
+            return;
+        }
+        var user = getCurrentFirebaseUser();
+        if (user == null) {
+            alert('No user!');
+            return;
+        }
+        progress.val(0);
+        progress.show();
+        uploadFile(file, user.uid,
+            function (snapshot) {
+                var percentage = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                progress.val(percentage);
+            },
+            function (err) {
+                console.log(err);
+                alert('Error!');
+                uploader.val('');
+                progress.hide();
+            },
+            function complete() {
+                alert('Finish uploading!');
+                uploader.val('');
+                progress.hide();
+                saveFileName(user.uid, file.name);
+            });
+    });
+}
+
 function getNewSaveChild(key, val) {
     return $('<div>').attr({ class: 'child saveChildSet margin' })
         .append($('<button>').attr({ class: 'b_saveChild' }).text('^v'))
@@ -905,19 +898,15 @@ function renderDownloadLinks(uid, fileNames) {
         return;
     }
     var keys = Object.keys(fileNames);
+    var $fileArea = $('#download_files');
     keys.forEach(function (key) {
         var fileName = fileNames[key];
-        var $fileArea = $('#download_files');
-        firebase.storage().ref(FIREBASE_BUCKET + '/' + uid + '/' + fileName).getDownloadURL().then(function (url) {
+        getDownloadUrl(uid, fileName, function (url) {
             $fileArea.append(createDownloadLink(url, fileName));
             $fileArea.append('<br>');
             $loader.hide();
         });
     });
-}
-
-function appendDownliadLink($fileArea, url, fileName) {
-
 }
 
 function createDownloadLink(url, fileName) {
@@ -1110,35 +1099,70 @@ function firebaseAuth(callback) {
         return;
     }
     var provider = new firebase.auth.GoogleAuthProvider();
-    firebase.auth().signInWithPopup(provider).then(function(result) {
-        console.log(result);
-        // This gives you a Google Access Token. You can use it to access the Google API.
-        var token = result.credential.accessToken;
-        // The signed-in user info.
-        var user = result.user;
-        console.log(user.uid);
-        callback(user.uid);
-        // ...
-    }).catch(function(error) {
+    firebase.auth().signInWithPopup(provider).then(function (result) {
+        callback(result.user.uid);
+    }).catch(function (error) {
         console.log(error);
-        // Handle Errors here.
-        var errorCode = error.code;
-        var errorMessage = error.message;
-        // The email of the user's account used.
-        var email = error.email;
-        // The firebase.firebaseAuth.AuthCredential type that was used.
-        var credential = error.credential;
-        // ...
+        console.log({
+            errorCode: error.code,
+            errorMessage: error.message,
+            email: error.email,
+            credential: error.credential
+        });
+        $('#local').click();
     });
+}
+
+function getCurrentFirebaseUser() {
+    return firebase.auth().currentUser;
+}
+
+function logoutFirebase() {
+    //TODO
 }
 
 function setFileNameListener(uid, callback) {
     if (!fileNamesRef) {
-        fileNamesRef = firebase.database().ref(FIREBASE_BUCKET + '/filenames/' + uid);
+        fileNamesRef = firebase.database().ref(getFirebaseFileNamePath(uid));
         fileNamesRef.on('value', function (snapshot) {
             callback(snapshot.val());
         });
     }
+}
+
+function uploadFile(file, uid, onStateChanged, onError, onComplete) {
+    firebase.storage().ref(getFirebaseFilePath(uid, file.name)).put(file)
+        .on('state_changed', onStateChanged, onError, onComplete);
+}
+
+function saveFileName(uid, fileName) {
+    firebase.database().ref(getFirebaseFileNamePath(uid)).push(fileName);
+}
+
+function getDownloadUrl(uid, fileName, callback) {
+    firebase.storage().ref(getFirebaseFilePath(uid, fileName)).getDownloadURL().then(function (url) {
+        callback(url);
+    });
+}
+
+function getFirebaseFilePath(uid, fileName) {
+    return FIREBASE_BUCKET + '/' + uid + '/' + fileName;
+}
+
+function getFirebaseFileNamePath(uid) {
+    return FIREBASE_FILE_NAME_PATH + uid;
+}
+
+function sendTextMessage(text) {
+    firebase.database().ref(FIREBASE_TEXT).set({
+        message: text
+    });
+}
+
+function receiveTextMessage(callback) {
+    firebase.database().ref(FIREBASE_TEXT).once('value').then(function (snapshot) {
+        callback(snapshot.val().message);
+    });
 }
 
 //firebase<<
