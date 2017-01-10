@@ -36,6 +36,14 @@ label {
     font-weight: normal;
 }
 
+a {
+    color: #cccccc;
+}
+
+a:hover {
+    color: #999999;
+}
+
 .container {
     max-width: 1500px;
 }
@@ -144,6 +152,10 @@ textarea {
     display: block;
 }
 
+#a_logout_firebase {
+    float: right;
+}
+
 /*file_storage*/
 
 #file_storage {
@@ -152,10 +164,6 @@ textarea {
 
 #firebase_storage_progress {
     width: 100%;
-}
-
-#download_files > a {
-    color: #cccccc;
 }
 
 #firebase_loader {
