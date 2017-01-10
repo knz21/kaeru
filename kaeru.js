@@ -865,10 +865,13 @@ function setFileNameList(fileNames) {
 }
 
 function renderDownloadLinks(uid) {
-    var $loader = $('#firebase_loader');
-    $loader.show();
+    var $loader = $('#firebase_loader_wrapper');
     var $fileArea = $('#download_files');
     $fileArea.children().remove();
+    if (fileNameList.length == 0) {
+        return;
+    }
+    $loader.show();
     fileNameList.forEach(function (fileName) {
         getDownloadUrl(uid, fileName, function (url) {
             $fileArea.append(createDownloadLink(url, fileName));
