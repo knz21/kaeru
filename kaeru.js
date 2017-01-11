@@ -9,11 +9,11 @@ var BACKUP_SEPARATOR = '\n\n\n---------------------\n\n\n';
 var MIN_CHILD_HEIGHT = 72;
 var MIN_CHILD_WIDTH = 160;
 var FIREBASE_BUCKET = 'kaeru_uploads';
-var FIREBASE_FILE_NAME_PATH = FIREBASE_BUCKET + '/filenames/';
+var FIREBASE_FILE_NAMES_PATH = FIREBASE_BUCKET + '/filenames/';
 var FIREBASE_TEXT = 'kaeru_text';
 var actionsOnSelectedTab = [];
 var fileNamesRef;
-var fileNameList = [];
+var fileNameMap = {};
 
 (function () {
     bindActions();
@@ -81,6 +81,7 @@ function bindActions() {
     $('#f_import').on('change', importBackup);
     $('#b_firebase_storage_upload').on('change', uploadToFirebaseStorage);
     $target.on('dragover', handleDragOver).on('drop', handleFileDrop(setTarget));
+    $('#download_files').on('click', '.a_delete_file', deleteStorageFile)
 }
 
 //firstTime>>
@@ -690,7 +691,7 @@ function onLocalSelected() {
 function onRemoteSelected() {
     firebaseAuth(function (uid) {
         setFileNameListener(uid, function (fileNames) {
-            setFileNameList(fileNames);
+            setFileNameMap(fileNames);
             renderDownloadLinks(uid);
         });
     });
@@ -853,36 +854,62 @@ function changeSize($target, height, width) {
     $target.width(width);
 }
 
-function setFileNameList(fileNames) {
+function setFileNameMap(fileNames) {
     if (fileNames == null) {
-        fileNameList = [];
-        return;
+        fileNameMap = {};
+    } else {
+        fileNameMap = fileNames;
     }
-    var keys = Object.keys(fileNames);
-    fileNameList = keys.map(function (key) {
-        return fileNames[key];
-    });
 }
 
 function renderDownloadLinks(uid) {
     var $loader = $('#firebase_loader_wrapper');
     var $fileArea = $('#download_files');
     $fileArea.children().remove();
-    if (fileNameList.length == 0) {
+    var keys = Object.keys(fileNameMap);
+    if (keys.length == 0) {
         return;
     }
     $loader.show();
-    fileNameList.forEach(function (fileName) {
+    keys.forEach(function (key) {
+        var fileName = fileNameMap[key];
         getDownloadUrl(uid, fileName, function (url) {
-            $fileArea.append(createDownloadLink(url, fileName));
-            $fileArea.append('<br>');
+            $fileArea.append(createDownloadLink(key, url, fileName));
             $loader.hide();
         });
     });
 }
 
-function createDownloadLink(url, fileName) {
-    return $('<a>').attr({ download: fileName, href: url }).text(fileName);
+function createDownloadLink(key, url, fileName) {
+    return $('<li>')
+        .append($('<a>').attr({ download: fileName, href: url }).text(fileName))
+        .append($('<a>').attr({ href: 'javascript:void(0)', class: 'a_delete_file' }).text('x'))
+        .append($('<input>').attr({ type: 'hidden', value: key }));
+}
+
+function deleteStorageFile(e) {
+    var key = $(e.target).parent().find('input').val();
+    var user = getCurrentFirebaseUser();
+    if (user == null) {
+        alert('No user!');
+        return;
+    }
+    var fileName = fileNameMap[key];
+    if (!confirm('Are you sure to delete file?: ' + fileName)) {
+        return;
+    }
+    deleteFile(user.uid, fileName, function () {
+        deleteFileName(user.uid, key);
+    });
+}
+
+function includes(obj, val) {
+    if (obj == null) {
+        return false;
+    }
+    return Object.keys(obj).some(function (key) {
+        return obj[key] === val;
+    });
 }
 
 //localStorage>>
@@ -1042,7 +1069,7 @@ function readFile(file, callback) {
 
 function uploadToFirebaseStorage(e) {
     var file = e.target.files[0];
-    var isOverwrite = fileNameList.includes(file.name);
+    var isOverwrite = includes(fileNameMap, file.name);
     if (isOverwrite && !confirm('Are you sure to overwrite file?: ' + file.name)) {
         return;
     }
@@ -1066,7 +1093,7 @@ function uploadToFirebaseStorage(e) {
         },
         function complete() {
             progress.val(100);
-            alert('Finish uploading!');
+            alert('Uploaded!');
             progress.hide();
             if (!isOverwrite) {
                 saveFileName(user.uid, file.name);
@@ -1129,7 +1156,7 @@ function logoutFirebase() {
 
 function setFileNameListener(uid, callback) {
     if (!fileNamesRef) {
-        fileNamesRef = firebase.database().ref(getFirebaseFileNamePath(uid));
+        fileNamesRef = firebase.database().ref(getFirebaseFileNamesPath(uid));
         fileNamesRef.on('value', function (snapshot) {
             callback(snapshot.val());
         });
@@ -1142,7 +1169,17 @@ function uploadFile(file, uid, onStateChanged, onError, onComplete) {
 }
 
 function saveFileName(uid, fileName) {
-    firebase.database().ref(getFirebaseFileNamePath(uid)).push(fileName);
+    firebase.database().ref(getFirebaseFileNamesPath(uid)).push(fileName);
+}
+
+function deleteFile(uid, fileName, callback) {
+    firebase.storage().ref(getFirebaseFilePath(uid, fileName)).delete().then(callback).catch(function (error) {
+        console.log(error);
+    });
+}
+
+function deleteFileName(uid, key) {
+    firebase.database().ref(getFirebaseFileNamesPath(uid)).child(key).remove();
 }
 
 function getDownloadUrl(uid, fileName, callback) {
@@ -1155,8 +1192,8 @@ function getFirebaseFilePath(uid, fileName) {
     return FIREBASE_BUCKET + '/' + uid + '/' + fileName;
 }
 
-function getFirebaseFileNamePath(uid) {
-    return FIREBASE_FILE_NAME_PATH + uid;
+function getFirebaseFileNamesPath(uid) {
+    return FIREBASE_FILE_NAMES_PATH + uid;
 }
 
 function sendTextMessage(text) {

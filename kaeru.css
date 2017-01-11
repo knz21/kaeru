@@ -44,6 +44,10 @@ a:hover {
     color: #999999;
 }
 
+ul {
+    list-style: none;
+}
+
 .container {
     max-width: 1500px;
 }
@@ -199,4 +203,19 @@ textarea {
     to {
         transform: rotate(360deg);
     }
+}
+
+#download_files a {
+    border-radius: 4px;
+    border: solid 1px #666666;
+    margin: 1px;
+    padding: 5px 10px;
+    background-color: #eeeeee;
+    color: #666666;
+    text-decoration: none;
+}
+
+#download_files a:hover {
+    background-color: #cccccc;
+    color: #333333;
 }
