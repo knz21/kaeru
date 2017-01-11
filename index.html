@@ -18,10 +18,10 @@
 </div>
 <div id="tab_menu" class="container">
     <div id="tab_buttons" class="row">
-        <div class="tab_button two columns selected">functions</div>
-        <div class="tab_button two columns">local</div>
-        <div class="tab_button two columns">remote</div>
-        <div class="tab_button two columns">others</div>
+        <div id="t_functions" class="tab_button two columns selected">functions</div>
+        <div id="t_local" class="tab_button two columns">local</div>
+        <div id="t_remote" class="tab_button two columns">remote</div>
+        <div id="t_others" class="tab_button two columns">others</div>
     </div>
 </div>
 <div id="functions" class="tab_content container first">
@@ -103,7 +103,10 @@
 <div id="remote" class="tab_content container invisible">
     <button id="b_text_send">send</button>
     <button id="b_text_receive">receive</button>
-    <a id="a_logout_firebase" href="javascript:void(0)">logout</a>
+    <div id="auth_info">
+        <span id="l_auth_mail"></span>
+        <a id="a_logout_firebase" href="javascript:void(0)">logout</a>
+    </div>
     <div id="file_storage">
         <label class="button">
             upload

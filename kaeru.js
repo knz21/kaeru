@@ -268,8 +268,12 @@ function receiveTextAction() {
 
 function logoutFirebaseAction() {
     if (confirm('Logout?')) {
-        logoutFirebase();
-        $('#local').click();
+        logoutFirebase(function () {
+            $('#t_local').click();
+            fileNamesRef = void(0);
+            $('#download_files').children().remove();
+            $('#l_auth_mail').text('');
+        });
     }
 }
 
@@ -689,10 +693,11 @@ function onLocalSelected() {
 }
 
 function onRemoteSelected() {
-    firebaseAuth(function (uid) {
-        setFileNameListener(uid, function (fileNames) {
+    firebaseAuth(function (user) {
+        $('#l_auth_mail').text(user.email + ': ');
+        setFileNameListener(user.uid, function (fileNames) {
             setFileNameMap(fileNames);
-            renderDownloadLinks(uid);
+            renderDownloadLinks(user.uid);
         });
     });
 }
@@ -1127,13 +1132,13 @@ function randomStr(length, hasNum, hasLowAlp, hasUprAlp) {
 
 function firebaseAuth(callback) {
     var user = firebase.auth().currentUser;
-    if (user != null && user.uid) {
-        callback(user.uid);
+    if (user != null) {
+        callback(user);
         return;
     }
     var provider = new firebase.auth.GoogleAuthProvider();
     firebase.auth().signInWithPopup(provider).then(function (result) {
-        callback(result.user.uid);
+        callback(result.user);
     }).catch(function (error) {
         console.log(error);
         console.log({
@@ -1142,7 +1147,7 @@ function firebaseAuth(callback) {
             email: error.email,
             credential: error.credential
         });
-        $('#local').click();
+        $('#t_local').click();
     });
 }
 
@@ -1150,8 +1155,10 @@ function getCurrentFirebaseUser() {
     return firebase.auth().currentUser;
 }
 
-function logoutFirebase() {
-    //TODO
+function logoutFirebase(callback) {
+    firebase.auth().signOut().then(callback, function(error) {
+        console.log(error);
+    });
 }
 
 function setFileNameListener(uid, callback) {
