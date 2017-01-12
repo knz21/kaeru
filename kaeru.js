@@ -24,60 +24,60 @@ var fileNameMap = {};
 })();
 
 function bindActions() {
-    bindWithoutHistory('#b_undo', undoAction);
-    bindWithoutHistory('#b_redo', redoAction);
-    bindWithoutHistory('#b_save', saveAction);
-    bind('#b_clear', clearAction);
-    bindWithoutHistory('#b_deleteAll', deleteAllAction);
-    bindWithoutHistory('#b_text_send', sendTextAction);
-    bind('#b_text_receive', receiveTextAction);
-    bindWithoutHistory('#a_logout_firebase', logoutFirebaseAction);
-    bindWithoutHistory('.tab_button', switchTabContentAction);
+    bind('#b_undo', undoAction);
+    bind('#b_redo', redoAction);
+    bind('#b_save', saveAction);
+    bindWithHistory('#b_clear', clearAction);
+    bind('#b_deleteAll', deleteAllAction);
+    bind('#b_text_send', sendTextAction);
+    bindWithHistory('#b_text_receive', receiveTextAction);
+    bind('#a_logout_firebase', logoutFirebaseAction);
+    bind('.tab_button', switchTabContentAction);
     var $saveArea = $('#save_area');
     $saveArea.on('click', '.b_saveChild', childSaveAction);
     $saveArea.on('click', '.b_deleteChild', childDeleteAction);
     $saveArea.on('click', '.b_reduceChild', childReduceAction);
     $saveArea.on('click', '.b_expandChild', childExpandAction);
-    bindWithoutHistory('#b_countLetter', countLetterAction);
-    bindWithoutHistory('#b_countRow', countRowAction);
-    bind('#b_upper', upperAction);
-    bind('#b_lower', lowerAction);
-    bind('#b_prefix', prefixAction);
-    bind('#b_suffix', suffixAction);
-    bind('#b_delHead1', deleteFromHeadSingleAction);
-    bind('#b_delHead', deleteFromHeadAction);
-    bind('#b_delTail', deleteFromTailAction);
-    bind('#b_delTail1', deleteFromTailSingleAction);
-    bind('#b_cutHead', cutFromHeadAction);
-    bind('#b_cutHeadWithVal', cutFromHeadWithValueAction);
-    bind('#b_cutTailWithVal', cutFromTailWithValueAction);
-    bind('#b_cutTail', cutFromTailAction);
-    bind('#b_replace', replaceAction);
-    bind('#b_replaceRegex', replaceRegexAction);
-    bind('#b_distinct', distinctAction);
-    bind('#b_duplication', duplicationAction);
-    bind('#b_single', singleAction);
-    bind('#b_sortAsc', sortAscAction);
-    bind('#b_sortDesc', sortDescAction);
-    bind('#b_closeUp', closeUpAction);
-    bind('#b_incHead', includeHeadAction);
-    bind('#b_incAny', includeAnyAction);
-    bind('#b_incTail', includeTailAction);
-    bind('#b_notIncHead', notIncludeHeadAction);
-    bind('#b_notIncAny', notIncludeAnyAction);
-    bind('#b_notIncTail', notIncludeTailAction);
-    bind('#b_single_line', singleLineAction);
-    bind('#b_break', breakAction);
-    bind('#b_order', orderAction);
-    bind('#b_lorem', addLoremAction);
-    bind('#b_toCamel', toCamelAction);
-    bind('#b_toSnake', toSnakeAction);
-    bind('#b_multiReplace', multiReplaceAction);
-    bind('#b_multiReplaceRegex', multiReplaceRegexAction);
-    bindWithoutHistory('#b_sequence', sequenceAction);
-    bindWithoutHistory('.b_cymbalForward', cymbalForwardAction);
-    bindWithoutHistory('.b_cymbalBack', cymbalBackAction);
-    bindWithoutHistory('#b_backup', backupAction);
+    bind('#b_countLetter', countLetterAction);
+    bind('#b_countRow', countRowAction);
+    bindWithHistory('#b_upper', upperAction);
+    bindWithHistory('#b_lower', lowerAction);
+    bindWithHistory('#b_prefix', prefixAction);
+    bindWithHistory('#b_suffix', suffixAction);
+    bindWithHistory('#b_delHead1', deleteFromHeadSingleAction);
+    bindWithHistory('#b_delHead', deleteFromHeadAction);
+    bindWithHistory('#b_delTail', deleteFromTailAction);
+    bindWithHistory('#b_delTail1', deleteFromTailSingleAction);
+    bindWithHistory('#b_cutHead', cutFromHeadAction);
+    bindWithHistory('#b_cutHeadWithVal', cutFromHeadWithValueAction);
+    bindWithHistory('#b_cutTailWithVal', cutFromTailWithValueAction);
+    bindWithHistory('#b_cutTail', cutFromTailAction);
+    bindWithHistory('#b_replace', replaceAction);
+    bindWithHistory('#b_replaceRegex', replaceRegexAction);
+    bindWithHistory('#b_distinct', distinctAction);
+    bindWithHistory('#b_duplication', duplicationAction);
+    bindWithHistory('#b_single', singleAction);
+    bindWithHistory('#b_sortAsc', sortAscAction);
+    bindWithHistory('#b_sortDesc', sortDescAction);
+    bindWithHistory('#b_closeUp', closeUpAction);
+    bindWithHistory('#b_incHead', includeHeadAction);
+    bindWithHistory('#b_incAny', includeAnyAction);
+    bindWithHistory('#b_incTail', includeTailAction);
+    bindWithHistory('#b_notIncHead', notIncludeHeadAction);
+    bindWithHistory('#b_notIncAny', notIncludeAnyAction);
+    bindWithHistory('#b_notIncTail', notIncludeTailAction);
+    bindWithHistory('#b_single_line', singleLineAction);
+    bindWithHistory('#b_break', breakAction);
+    bindWithHistory('#b_order', orderAction);
+    bindWithHistory('#b_lorem', addLoremAction);
+    bindWithHistory('#b_toCamel', toCamelAction);
+    bindWithHistory('#b_toSnake', toSnakeAction);
+    bindWithHistory('#b_multiReplace', multiReplaceAction);
+    bindWithHistory('#b_multiReplaceRegex', multiReplaceRegexAction);
+    bind('#b_sequence', sequenceAction);
+    bind('.b_cymbalForward', cymbalForwardAction);
+    bind('.b_cymbalBack', cymbalBackAction);
+    bind('#b_backup', backupAction);
     $('#f_import').on('change', importBackup);
     $('#b_firebase_storage_upload').on('change', uploadToFirebaseStorage);
     $target.on('dragover', handleDragOver).on('drop', handleFileDrop(setTarget));
@@ -86,11 +86,11 @@ function bindActions() {
 
 //firstTime>>
 
-function bind(id, func) {
+function bindWithHistory(id, func) {
     innerBind(id, setSaveHistory(func))
 }
 
-function bindWithoutHistory(id, func) {
+function bind(id, func) {
     innerBind(id, func);
 }
 
@@ -951,8 +951,7 @@ function removeAll() {
 }
 
 function autoSave(val) {
-    var key = KEY_AUTO_SAVE;
-    localStorage.setItem(key, val);
+    localStorage.setItem(KEY_AUTO_SAVE, val);
 }
 
 function save(val) {
