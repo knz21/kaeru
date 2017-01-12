@@ -21,6 +21,7 @@ var fileNameMap = {};
     setCopyButton();
     loadLocalStorage();
     startAutoSave();
+    catchRedirectAuth();
 })();
 
 function bindActions() {
@@ -136,6 +137,12 @@ function startAutoSave() {
     setInterval(function () {
         autoSave($target.val());
     }, 60000);
+}
+
+function catchRedirectAuth() {
+    getRedirectAuth(function () {
+        $('#t_remote').click();
+    });
 }
 
 //firstTime<<
@@ -1136,9 +1143,14 @@ function firebaseAuth(callback) {
         callback(user);
         return;
     }
-    var provider = new firebase.auth.GoogleAuthProvider();
-    firebase.auth().signInWithPopup(provider).then(function (result) {
-        callback(result.user);
+    autoSave($target.val());
+    firebase.auth().signInWithRedirect(new firebase.auth.GoogleAuthProvider());
+}
+function getRedirectAuth(callback) {
+    firebase.auth().getRedirectResult().then(function (result) {
+        if (result.credential) {
+            callback();
+        }
     }).catch(function (error) {
         console.log(error);
         console.log({
@@ -1147,7 +1159,6 @@ function firebaseAuth(callback) {
             email: error.email,
             credential: error.credential
         });
-        $('#t_local').click();
     });
 }
 
@@ -1156,7 +1167,7 @@ function getCurrentFirebaseUser() {
 }
 
 function logoutFirebase(callback) {
-    firebase.auth().signOut().then(callback, function(error) {
+    firebase.auth().signOut().then(callback, function (error) {
         console.log(error);
     });
 }
