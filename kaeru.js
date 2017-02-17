@@ -36,6 +36,7 @@ function bindActions() {
     bind('.tab_button', switchTabContentAction);
     var $saveArea = $('#save_area');
     $saveArea.on('click', '.b_saveChild', childSaveAction);
+    $saveArea.on('click', '.b_restoreChild', childRestoreAction);
     $saveArea.on('click', '.b_deleteChild', childDeleteAction);
     $saveArea.on('click', '.b_reduceChild', childReduceAction);
     $saveArea.on('click', '.b_expandChild', childExpandAction);
@@ -245,14 +246,14 @@ function saveAction() {
 }
 
 function clearAction() {
-    if ($target.val().length > 0 && window.confirm('Are you sure to clear text?')) {
+    if ($target.val().length > 0 && confirm('Are you sure to clear text?')) {
         $target.val('');
     }
 }
 
 function deleteAllAction() {
     var $all = $('#save_area').find('.saveChildSet');
-    if ($all.length > 0 && window.confirm('Are you sure to delete all?')) {
+    if ($all.length > 0 && confirm('Are you sure to delete all?')) {
         removeAll();
         $all.remove();
         $('#b_deleteAll').hide();
@@ -266,7 +267,7 @@ function sendTextAction() {
 
 function receiveTextAction() {
     receiveTextMessage(function (text) {
-        if ($target.val().length > 0 && !window.confirm('Are you sure to overwrite text?')) {
+        if ($target.val().length > 0 && !confirm('Are you sure to overwrite text?')) {
             return;
         }
         $target.val(text);
@@ -311,6 +312,16 @@ function childSaveAction(event) {
         $target.val(thisVal);
         $thisTextArea.val(targetVal);
         update($thisButton.parent().find('.h_key').val(), targetVal);
+    }
+}
+
+function childRestoreAction(event) {
+    var $thisButton = $(event.target);
+    var $thisTextArea = $thisButton.parent().find('.ta_saveChild');
+    var thisVal = $thisTextArea.val();
+    var targetVal = $target.val();
+    if (thisVal !== targetVal && confirm('Are you sure to overwrite text?')) {
+        $target.val(thisVal);
     }
 }
 
@@ -725,6 +736,7 @@ function setCopy($copyBtn, $targetTa) {
 function getNewSaveChild(key, val) {
     return $('<div>').attr({ class: 'child saveChildSet margin' })
         .append($('<button>').attr({ class: 'b_saveChild' }).text('^v'))
+        .append($('<button>').attr({ class: 'b_restoreChild' }).text('^'))
         .append($('<button>').attr({ class: 'b_copyChild' }).text('copy'))
         .append($('<button>').attr({ class: 'b_deleteChild' }).text('delete'))
         .append($('<br/>'))
