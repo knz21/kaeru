@@ -37,6 +37,7 @@ function bindActions() {
     var $saveArea = $('#save_area');
     $saveArea.on('click', '.b_saveChild', childSaveAction);
     $saveArea.on('click', '.b_restoreChild', childRestoreAction);
+    $saveArea.on('click', '.b_updateChild', childUpdateAction);
     $saveArea.on('click', '.b_deleteChild', childDeleteAction);
     $saveArea.on('click', '.b_reduceChild', childReduceAction);
     $saveArea.on('click', '.b_expandChild', childExpandAction);
@@ -322,6 +323,15 @@ function childRestoreAction(event) {
     var targetVal = $target.val();
     if (thisVal !== targetVal && confirm('Are you sure to overwrite text?')) {
         $target.val(thisVal);
+    }
+}
+
+function childUpdateAction(event) {
+    var $thisButton = $(event.target);
+    var $thisTextArea = $thisButton.parent().find('.ta_saveChild');
+    var thisVal = $thisTextArea.val();
+    if (confirm('Are you sure to update?')) {
+        update($thisButton.parent().find('.h_key').val(), thisVal);
     }
 }
 
@@ -738,6 +748,8 @@ function getNewSaveChild(key, val) {
         .append($('<button>').attr({ class: 'b_saveChild' }).text('^v'))
         .append($('<button>').attr({ class: 'b_restoreChild' }).text('^'))
         .append($('<button>').attr({ class: 'b_copyChild' }).text('copy'))
+        .append($('<br/>'))
+        .append($('<button>').attr({ class: 'b_updateChild' }).text('update'))
         .append($('<button>').attr({ class: 'b_deleteChild' }).text('delete'))
         .append($('<br/>'))
         .append($('<button>').attr({ class: 'b_reduceChild' }).text('-><-'))
