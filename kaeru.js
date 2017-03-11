@@ -14,6 +14,7 @@ var FIREBASE_TEXT = 'kaeru_text';
 var actionsOnSelectedTab = [];
 var fileNamesRef;
 var fileNameMap = {};
+var isReceiverModified = false;
 
 (function () {
     bindActions();
@@ -30,8 +31,9 @@ function bindActions() {
     bind('#b_save', saveAction);
     bindWithHistory('#b_clear', clearAction);
     bind('#b_deleteAll', deleteAllAction);
-    bind('#b_text_send', sendTextAction);
-    bindWithHistory('#b_text_receive', receiveTextAction);
+    bind('#b_text_update', updateTextAction);
+    bind('#b_reload_receiver', receiveTextAction);
+    bindWithHistory('#b_receiver_to_target', receiverToTargetAction);
     bind('#a_logout_firebase', logoutFirebaseAction);
     bind('.tab_button', switchTabContentAction);
     var $saveArea = $('#save_area');
@@ -82,6 +84,7 @@ function bindActions() {
     bind('.b_cymbalBack', cymbalBackAction);
     bind('#b_backup', backupAction);
     $('#f_import').on('change', importBackup);
+    $('#ta_receiver').on('change', receiverModified);
     $('#b_firebase_storage_upload').on('change', uploadToFirebaseStorage);
     $target.on('dragover', handleDragOver).on('drop', handleFileDrop(setTarget));
     $('#download_files').on('click', '.a_delete_file', deleteStorageFile)
@@ -261,18 +264,29 @@ function deleteAllAction() {
     }
 }
 
-function sendTextAction() {
-    sendTextMessage($target.val());
+function updateTextAction() {
+    isReceiverModified = false;
+    sendTextMessage($('#ta_receiver').val());
     alert('Finish sending!');
 }
 
 function receiveTextAction() {
     receiveTextMessage(function (text) {
-        if ($target.val().length > 0 && !confirm('Are you sure to overwrite text?')) {
+        var $receiver = $('#ta_receiver');
+        if ($receiver.val().length > 0 && !confirm('Are you sure to overwrite text?')) {
             return;
         }
-        $target.val(text);
+        $receiver.val(text);
+        $('#b_reload_receiver').hide();
     });
+}
+
+function receiverToTargetAction() {
+    var $receiver = $('#ta_receiver');
+    if ($receiver.val().length > 0 && $target.val().length > 0 && !confirm('Are you sure to overwrite text?')) {
+        return;
+    }
+    $target.val($receiver.val());
 }
 
 function logoutFirebaseAction() {
@@ -727,6 +741,13 @@ function onRemoteSelected() {
             setFileNameMap(fileNames);
             renderDownloadLinks(user.uid);
         });
+        setTextMessageReceiver(function (message) {
+            if (isReceiverModified) {
+                $('#b_reload_receiver').show();
+            } else {
+                $('#ta_receiver').val(message);
+            }
+        });
     });
 }
 
@@ -946,6 +967,10 @@ function includes(obj, val) {
     return Object.keys(obj).some(function (key) {
         return obj[key] === val;
     });
+}
+
+function receiverModified() {
+    isReceiverModified = true;
 }
 
 //localStorage>>
@@ -1245,6 +1270,12 @@ function sendTextMessage(text) {
 
 function receiveTextMessage(callback) {
     firebase.database().ref(FIREBASE_TEXT).once('value').then(function (snapshot) {
+        callback(snapshot.val().message);
+    });
+}
+
+function setTextMessageReceiver(callback) {
+    firebase.database().ref(FIREBASE_TEXT).on('value', function (snapshot) {
         callback(snapshot.val().message);
     });
 }

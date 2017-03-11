@@ -166,6 +166,10 @@ textarea {
     min-height: 200px;
 }
 
+#ta_receiver {
+    width: 100%;
+}
+
 #firebase_storage_progress {
     width: 100%;
 }
