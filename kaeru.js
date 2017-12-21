@@ -19,7 +19,6 @@ var isReceiverModified = false;
 (function () {
     bindActions();
     bindActionOnSelectTab();
-    setCopyButton();
     loadLocalStorage();
     startAutoSave();
     catchRedirectAuth();
@@ -28,6 +27,7 @@ var isReceiverModified = false;
 function bindActions() {
     bind('#b_undo', undoAction);
     bind('#b_redo', redoAction);
+    bind('#b_copy', copyAction);
     bind('#b_save', saveAction);
     bindWithHistory('#b_clear', clearAction);
     bind('#b_wrap', wrapAction);
@@ -40,6 +40,7 @@ function bindActions() {
     var $saveArea = $('#save_area');
     $saveArea.on('click', '.b_saveChild', childSaveAction);
     $saveArea.on('click', '.b_restoreChild', childRestoreAction);
+    $saveArea.on('click', '.b_copyChild', childCopyAction);
     $saveArea.on('click', '.b_updateChild', childUpdateAction);
     $saveArea.on('click', '.b_deleteChild', childDeleteAction);
     $saveArea.on('click', '.b_reduceChild', childReduceAction);
@@ -129,10 +130,6 @@ function bindActionOnSelectTab() {
     actionsOnSelectedTab[idx++] = onLocalSelected;
     actionsOnSelectedTab[idx++] = onRemoteSelected;
     actionsOnSelectedTab[idx] = onOthersSelected;
-}
-
-function setCopyButton() {
-    setCopy($('#b_copy'), $target);
 }
 
 function loadLocalStorage() {
@@ -232,6 +229,10 @@ function redoAction() {
     }
 }
 
+function copyAction() {
+    setCopy($target);
+}
+
 function saveAction() {
     if ($target.val().length == 0) {
         return;
@@ -246,7 +247,6 @@ function saveAction() {
     }
     var val = $target.val();
     getNewSaveChild(save(val), val).prependTo('#save_area');
-    setChildCopyAction();
     $('#b_deleteAll').show();
 }
 
@@ -343,6 +343,12 @@ function childRestoreAction(event) {
     if (thisVal !== targetVal && confirm('Are you sure to overwrite text?')) {
         $target.val(thisVal);
     }
+}
+
+function childCopyAction(event) {
+    var $thisButton = $(event.target);
+    var $thisTextArea = $thisButton.parent().find('.ta_saveChild');
+    setCopy($thisTextArea);
 }
 
 function childUpdateAction(event) {
@@ -761,12 +767,10 @@ function onOthersSelected() {
 
 //Actions On Selected Tab<<
 
-function setCopy($copyBtn, $targetTa) {
-    var $btnCopy = $copyBtn.get(0);
-    var clip = new ZeroClipboard($btnCopy);
-    clip.on("ready beforecopy", function () {
-        $btnCopy.dataset.clipboardText = $targetTa.val();
-    });
+function setCopy($ta) {
+    $ta.select();
+    document.execCommand('copy');
+    window.getSelection().removeAllRanges();
 }
 
 function getNewSaveChild(key, val) {
@@ -782,12 +786,6 @@ function getNewSaveChild(key, val) {
         .append($('<button>').attr({ class: 'b_expandChild' }).text('<->'))
         .append($('<textarea>').attr({ class: 'ta_saveChild', wrap: 'off' }).val(val))
         .append($('<hidden>').attr({ class: 'h_key' }).val(key));
-}
-
-function setChildCopyAction() {
-    var $children = $('#save_area').find('.child');
-    var $lastChild = $($children.get($children.length - 1));
-    setCopy($lastChild.find('.b_copyChild'), $lastChild.find('.ta_saveChild'));
 }
 
 function getCheckedCount(count) {
@@ -992,7 +990,6 @@ function load() {
     keys.forEach(function (key) {
         var child = getNewSaveChild(key, localStorage.getItem(key));
         child.appendTo('#save_area');
-        setCopy(child.find('.b_copyChild'), child.find('.ta_saveChild'));
     });
     if (keys.length > 0) {
         $('#b_deleteAll').show();
