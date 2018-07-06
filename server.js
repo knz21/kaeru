@@ -8,14 +8,19 @@ http.createServer(function (req, res) {
             url = '/index.html';
         }
         fs.readFile(__dirname + url, 'utf-8', function (err, data) {
-            if (err) {console.log(err);
-                res.writeHead(404, {'Content-Type': 'text/plain'});
-                res.write('not found');
-                return res.end();
+            if (err) {
+                console.log(err);
+                res.writeHead(404, { 'Content-Type': 'text/plain' });
+                res.end('not found');
+                return;
             }
-            res.writeHead(200, {'Content-Type': getContentType(url)});
-            res.write(data);
-            res.end();
+            var mimeType = getContentType(url);
+            res.writeHead(200, { 'Content-Type': mimeType });
+            if (mimeType.includes('image')) {
+                res.end(fs.readFileSync('.' + url), 'binary');
+            } else {
+                res.end(data);
+            }
         });
     } else {
         res.statusCode = 404;
@@ -33,6 +38,13 @@ function getContentType(url) {
             return 'text/javascript';
         case 'css':
             return 'text/css';
+        case 'png':
+            return 'image/png';
+        case 'jpeg':
+        case 'jpg':
+            return 'image/jpeg';
+        case 'ico':
+            return 'image/vnd.microsoft.icon';
         default:
             return 'text/plain';
     }
