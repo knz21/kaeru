@@ -1,6 +1,6 @@
 body {
     padding: 20px;
-    background-color: #282c34;
+    background-color: #364032;
 }
 
 input[type="email"],
@@ -21,23 +21,23 @@ button,
 .button {
     font-size: 13px;
     text-transform: none;
-    background-color: #bed1f4;
+    background-color: #55d98d;
     border: none;
 }
 
 button:hover,
 .button:hover {
-    background-color: #b3c5e7;
+    background-color: #35d277;
 }
 
 span,
 label {
-    color: #cccccc;
+    color: #dddddd;
     font-weight: normal;
 }
 
 a {
-    color: #cccccc;
+    color: #dddddd;
 }
 
 a:hover {
@@ -65,13 +65,13 @@ ul {
 
 .tab_button.selected {
     border-bottom: none;
-    color: #cccccc;
-    background-color: #555d6d;
+    color: #dddddd;
+    background-color: #4c6f47;
 }
 
 .tab_content {
     border-radius: 4px;
-    background-color: #555d6d;
+    background-color: #4c6f47;
     padding: 15px;
 }
 
@@ -220,6 +220,6 @@ textarea {
 }
 
 #download_files a:hover {
-    background-color: #cccccc;
+    background-color: #dddddd;
     color: #333333;
 }
