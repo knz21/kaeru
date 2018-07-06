@@ -21,13 +21,13 @@ button,
 .button {
     font-size: 13px;
     text-transform: none;
-    background-color: #55d98d;
+    background-color: #7de075;
     border: none;
 }
 
 button:hover,
 .button:hover {
-    background-color: #35d277;
+    background-color: #50d545;
 }
 
 span,
