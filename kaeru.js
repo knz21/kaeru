@@ -49,6 +49,7 @@ function bindActions() {
     bind('#b_countRow', countRowAction);
     bindWithHistory('#b_upper', upperAction);
     bindWithHistory('#b_lower', lowerAction);
+    bindWithHistory('#b_initcap', initcapAction);
     bindWithHistory('#b_prefix', prefixAction);
     bindWithHistory('#b_suffix', suffixAction);
     bindWithHistory('#b_delHead1', deleteFromHeadSingleAction);
@@ -409,6 +410,18 @@ function lowerAction() {
 
     function lowerProcess(str) {
         return str.toLowerCase();
+    }
+}
+
+function initcapAction() {
+    executeModify(initcapProcess);
+
+    function initcapProcess(str) {
+        var fIdx = str.search(/([a-z]|[A-Z])/);
+        if (fIdx < 0) {
+            return str;
+        }
+        return str.substr(0, fIdx) + str[fIdx].toUpperCase() + str.substr(fIdx + 1, str.length - fIdx - 1).toLowerCase();
     }
 }
 
