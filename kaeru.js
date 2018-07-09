@@ -62,6 +62,9 @@ function bindActions() {
     bindWithHistory('#b_cutTail', cutFromTailAction);
     bindWithHistory('#b_replace', replaceAction);
     bindWithHistory('#b_replaceRegex', replaceRegexAction);
+    bindWithHistory('#b_trimLeft', trimLeftAction);
+    bindWithHistory('#b_trim', trimAction);
+    bindWithHistory('#b_trimRight', trimRightAction);
     bindWithHistory('#b_distinct', distinctAction);
     bindWithHistory('#b_duplication', duplicationAction);
     bindWithHistory('#b_single', singleAction);
@@ -528,6 +531,30 @@ function replaceRegexAction() {
     var dest = getVal('#t_repDest');
 
     setTarget($target.val().replace(new RegExp(org, 'g'), dest));
+}
+
+function trimLeftAction() {
+    executeModify(trimLeft);
+
+    function trimLeft(str) {
+        return str.replace(/^\s+/g, '');
+    }
+}
+
+function trimAction() {
+    executeModify(trim);
+
+    function trim(str) {
+        return str.trim();
+    }
+}
+
+function trimRightAction() {
+    executeModify(trimRight);
+
+    function trimRight(str) {
+        return str.replace(/\s+$/g, '');
+    }
 }
 
 function distinctAction() {
