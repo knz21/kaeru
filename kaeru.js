@@ -77,7 +77,7 @@ function bindActions() {
     bindWithHistory('#b_notIncHead', notIncludeHeadAction);
     bindWithHistory('#b_notIncAny', notIncludeAnyAction);
     bindWithHistory('#b_notIncTail', notIncludeTailAction);
-    bindWithHistory('#b_single_line', singleLineAction);
+    bindWithHistory('#b_join', joinAction);
     bindWithHistory('#b_break', breakAction);
     bindWithHistory('#b_order', orderAction);
     bindWithHistory('#b_lorem', addLoremAction);
@@ -651,8 +651,8 @@ function notIncludeTailAction() {
     }
 }
 
-function singleLineAction() {
-    setTarget($target.val().replace(new RegExp('\n', 'g'), ''));
+function joinAction() {
+    setTarget($target.val().replace(new RegExp('\n', 'g'), getVal('#t_join')));
 }
 
 function breakAction() {
