@@ -78,6 +78,7 @@ function bindActions() {
     bindWithHistory('#b_notIncAny', notIncludeAnyAction);
     bindWithHistory('#b_notIncTail', notIncludeTailAction);
     bindWithHistory('#b_join', joinAction);
+    bindWithHistory('#b_split', splitAction);
     bindWithHistory('#b_break', breakAction);
     bindWithHistory('#b_order', orderAction);
     bindWithHistory('#b_lorem', addLoremAction);
@@ -655,22 +656,29 @@ function joinAction() {
     setTarget($target.val().replace(new RegExp('\n', 'g'), getVal('#t_join')));
 }
 
+function splitAction() {
+    executeBreak(splitProcess);
+
+    function splitProcess(str) {
+        return breakLine(str, getVal('#t_split_break'), true);
+    }
+}
+
 function breakAction() {
-    var val = getVal('#t_break');
     executeBreak(breakProcess);
 
     function breakProcess(str) {
-        return execModifyForBreak(str.split(val), function (thisStr) {
-            return thisStr + val;
-        });
-
-        function execModifyForBreak(ary, proc) {
-            ary.forEach(function (val, idx) {
-                ary[idx] = (idx < ary.length - 1) ? proc(val) : val;
-            });
-            return ary;
-        }
+        return breakLine(str, getVal('#t_split_break'), false);
     }
+}
+
+function breakLine(str, delimiter, isSplit) {
+    var ary = str.split(delimiter);
+
+    ary.forEach(function (val, idx) {
+        ary[idx] = (!isSplit && idx < ary.length - 1) ? val + delimiter : val;
+    });
+    return ary;
 }
 
 function orderAction() {
