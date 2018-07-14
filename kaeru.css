@@ -1,6 +1,6 @@
 body {
     padding: 20px;
-    background-color: #364032;
+    background-color: #222222;
 }
 
 input[type="email"],
@@ -21,13 +21,13 @@ button,
 .button {
     font-size: 13px;
     text-transform: none;
-    background-color: #7de075;
+    background-color: #7FC2B4;
     border: none;
 }
 
 button:hover,
 .button:hover {
-    background-color: #50d545;
+    background-color: #6EB9AA;
 }
 
 span,
@@ -66,12 +66,12 @@ ul {
 .tab_button.selected {
     border-bottom: none;
     color: #dddddd;
-    background-color: #4c6f47;
+    background-color: #37474F;
 }
 
 .tab_content {
     border-radius: 4px;
-    background-color: #4c6f47;
+    background-color: #37474F;
     padding: 15px;
 }
 
