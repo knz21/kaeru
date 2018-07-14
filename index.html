@@ -136,7 +136,8 @@
     </div>
 </div>
 <div id="others" class="tab_content container invisible">
-    <div id="cymbal">
+    <div id="cymbal" class="cf">
+        <label>cymbal</label>
         <div>
             <textarea class="ta_cymbal"></textarea>
             <button class="b_cymbalForward">join-></button>
@@ -157,7 +158,8 @@
             <button class="b_cymbalBack"><-join</button>
         </div>
     </div>
-    <div id="multiReplace">
+    <div id="multiReplace" class="cf">
+        <label>multi replace</label>
         <textarea id="ta_replaceOrg"></textarea>
         <div id="replaceButtons">
             <button id="b_multiReplace">multi replace</button>
@@ -167,22 +169,25 @@
         <textarea id="ta_replaceDest"></textarea>
     </div>
     <div id="sequence">
+        <label>sequence</label>
         <input type="text" id="t_seqOrg">
-        <div id="seqStart">
-            <label id="l_seqStart">start</label>
-            <input type="number" id="t_seqStart" value="0">
-        </div>
-        <div id="seqStep">
-            <label id="l_seqStep">step</label>
-            <input type="number" id="t_seqStep" value="0">
-        </div>
-        <div id="seqLines">
-            <label id="l_seqLines">lines</label>
-            <input type="number" id="t_seqLines" value="1">
-        </div>
-        <div id="seqToken">
-            <label id="l_seqToken">token</label>
-            <input type="text" id="t_seqToken" value="#">
+        <div id="sequence_inputs" class="cf">
+            <div id="seqStart">
+                <label id="l_seqStart">start</label>
+                <input type="number" id="t_seqStart" value="0">
+            </div>
+            <div id="seqStep">
+                <label id="l_seqStep">step</label>
+                <input type="number" id="t_seqStep" value="0">
+            </div>
+            <div id="seqLines">
+                <label id="l_seqLines">lines</label>
+                <input type="number" id="t_seqLines" value="1">
+            </div>
+            <div id="seqToken">
+                <label id="l_seqToken">token</label>
+                <input type="text" id="t_seqToken" value="#">
+            </div>
         </div>
         <button id="b_sequence">sequence</button>
         <textarea id="ta_seqResult"></textarea>

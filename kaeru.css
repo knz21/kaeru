@@ -137,7 +137,7 @@ textarea {
     width: 100%;
 }
 
-#sequence div {
+#sequence_inputs div {
     float: left;
 }
 
@@ -158,6 +158,16 @@ textarea {
 
 #auth_info {
     float: right;
+}
+
+/* clearfix */
+.cf:before, .cf:after {
+    content: "";
+    display: table
+}
+
+.cf:after {
+    clear: both
 }
 
 /*file_storage*/
