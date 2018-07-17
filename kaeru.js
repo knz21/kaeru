@@ -87,6 +87,8 @@ function bindActions() {
     bindWithHistory('#b_multiReplace', multiReplaceAction);
     bindWithHistory('#b_multiReplaceRegex', multiReplaceRegexAction);
     bind('#b_sequence', sequenceAction);
+    bind('#b_draw', drawAction);
+    bind('#b_color_trial', colorTrialAction);
     bind('.b_cymbalForward', cymbalForwardAction);
     bind('.b_cymbalBack', cymbalBackAction);
     bind('#b_backup', backupAction);
@@ -767,6 +769,44 @@ function sequenceAction() {
     }
 }
 
+function drawAction() {
+    var $ta = $('#ta_color'),
+        ary = getArrayFromTextArea($ta),
+        $list = $('#color_list'),
+        $compList = $('#complementary_color_list');
+    changeSize($ta, $ta[0].scrollHeight, $ta.width);
+    $list.children().remove();
+    $list.append($('<li>').text('color'));
+    $list.css('background', '#ffffff');
+    $compList.children().remove();
+    $compList.append($('<li>').text('complementary color'));
+    $compList.css('background', '#ffffff');
+    ary.forEach(function (val) {
+        var m = val.match(/((\d|[a-f]|[A-F]){8}|(\d|[a-f]|[A-F]){6})/);
+        if (m) {
+            var color = m[0],
+                rgb = colorCodeToRgb(color),
+                hsv = rgbToHsv(rgb[0], rgb[1], rgb[2], false);
+            $list.append(
+                $('<li>')
+                    .attr({ style: 'background: #' + color + ';color:  #' + getValueContrastColor(color) + ';' })
+                    .text('#' + color + ' RGB(' + rgb.join(',') + ') HSV(' + hsv.join(',') + ')')
+            );
+            var compColor = getComplementaryColor(color);
+            $compList.append(
+                $('<li>')
+                    .attr({ style: 'background: #' + compColor + ';color:  #' + getValueContrastColor(compColor) + ';' })
+                    .text('#' + compColor)
+            );
+        }
+    });
+}
+
+function colorTrialAction() {
+    $('#ta_color').val('#FF0000\n#FFFF00\n#00FF00\n#00FFFF\n#0000FF\n#FF00FF');
+    drawAction();
+}
+
 function cymbalForwardAction(event) {
     var $button = $(event.target);
     cymbal($button.prev(), getForwardTarget($button), true);
@@ -1022,6 +1062,140 @@ function includes(obj, val) {
 
 function receiverModified() {
     isReceiverModified = true;
+}
+
+function getValueContrastColor(colorCode) {
+    var rgb = colorCodeToRgb(colorCode),
+        hsv = rgbToHsv(rgb[0], rgb[1], rgb[2], false),
+        contrastRgb = hsvToRgb(hsv[0], hsv[1], hsv[2] > 255 / 2 ? Math.round(255 * 0.15) : Math.round(255 * 0.85));
+    return rgbToColorCode(contrastRgb[0], contrastRgb[1], contrastRgb[2]);
+}
+
+function getComplementaryColor(colorCode) {
+    var rgb = colorCodeToRgb(colorCode),
+        max = Math.max(rgb[0], Math.max(rgb[1], rgb[2])),
+        min = Math.min(rgb[0], Math.min(rgb[1], rgb[2])),
+        sum = max + min;
+    return colorCode.length == 8 ? colorCode.substr(0, 2) : '' + rgbToColorCode(sum - rgb[0], sum - rgb[1], sum - rgb[2]);
+}
+
+function colorCodeToRgb(colorCode) {
+    if (colorCode.length != 6 && colorCode.length != 8) {
+        return [];
+    }
+    var index = colorCode.length == 6 ? 0 : 2;
+    return [
+        hexToDecimal(colorCode.substr(index, 2)),
+        hexToDecimal(colorCode.substr(index + 2, 2)),
+        hexToDecimal(colorCode.substr(index + 4, 2))
+    ];
+}
+
+function rgbToColorCode(r, g, b) {
+    return decimalToHex(r) + decimalToHex(g) + decimalToHex(b);
+}
+
+function decimalToHex(decimal) {
+    return decimal == 0 ? '00' : pad(decimal.toString(16));
+}
+
+function hexToDecimal(hex) {
+    return parseInt(hex, 16);
+}
+
+/**
+ * RGBをHSVに変換
+ * @param   {Number}  r         red値   ※ 0～255 の数値
+ * @param   {Number}  g         green値 ※ 0～255 の数値
+ * @param   {Number}  b         blue値  ※ 0～255 の数値
+ * @param   {Boolean} coneModel 円錐モデルにするか
+ * @return  {Array}  [h, s, v] ※ h は 0～360の数値、s/v は 0～255 の数値
+ */
+function rgbToHsv(r, g, b, coneModel) {
+    var h, s, v,
+        max = Math.max(Math.max(r, g), b),
+        min = Math.min(Math.min(r, g), b);
+    // hue の計算
+    if (max == min) {
+        h = 0;
+    } else if (max == r) {
+        h = 60 * (g - b) / (max - min);
+    } else if (max == g) {
+        h = (60 * (b - r) / (max - min)) + 120;
+    } else {
+        h = (60 * (r - g) / (max - min)) + 240;
+    }
+    while (h < 0) {
+        h += 360;
+    }
+    // saturation の計算
+    if (coneModel) {
+        // 円錐モデルの場合
+        s = max - min;
+    } else {
+        s = max == 0 ? 0 : (max - min) / max * 255;
+    }
+    // value の計算
+    v = max;
+    return [Math.round(h), Math.round(s), Math.round(v)];
+}
+
+/**
+ * HSVをRGBに変換
+ * @param   {Number}  h         hue値        ※ 0～360の数値
+ * @param   {Number}  s         saturation値 ※ 0～255 の数値
+ * @param   {Number}  v         value値      ※ 0～255 の数値
+ * @return  {Array}  [r, g, b] ※ r/g/b は 0～255 の数値
+ */
+function hsvToRgb(h, s, v) {
+    var r, g, b;
+    while (h < 0) {
+        h += 360;
+    }
+    h = h % 360;
+    if (s == 0) {
+        v = Math.round(v);
+        return [v, v, v];
+    }
+    s = s / 255;
+    var i = Math.floor(h / 60) % 6,
+        f = (h / 60) - i,
+        p = v * (1 - s),
+        q = v * (1 - f * s),
+        t = v * (1 - (1 - f) * s);
+    switch (i) {
+        case 0 :
+            r = v;
+            g = t;
+            b = p;
+            break;
+        case 1 :
+            r = q;
+            g = v;
+            b = p;
+            break;
+        case 2 :
+            r = p;
+            g = v;
+            b = t;
+            break;
+        case 3 :
+            r = p;
+            g = q;
+            b = v;
+            break;
+        case 4 :
+            r = t;
+            g = p;
+            b = v;
+            break;
+        case 5 :
+            r = v;
+            g = p;
+            b = q;
+            break;
+    }
+    return [Math.round(r), Math.round(g), Math.round(b)];
 }
 
 //localStorage>>

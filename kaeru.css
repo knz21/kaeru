@@ -156,6 +156,28 @@ textarea {
     display: block;
 }
 
+#color textarea {
+    width: 200px;
+    height: 100px;
+    float: left;
+}
+
+#color div,
+#color ul {
+    float: left;
+}
+
+#color_list,
+#complementary_color_list {
+    padding: 10px;
+}
+
+#color_list li,
+#complementary_color_list li {
+    margin: 0;
+    padding: 5px;
+}
+
 #auth_info {
     float: right;
 }
