@@ -8,6 +8,7 @@ var BACKUP_FILE_PREFIX = 'kaeru_backup_';
 var BACKUP_SEPARATOR = '\n\n\n---------------------\n\n\n';
 var MIN_CHILD_HEIGHT = 72;
 var MIN_CHILD_WIDTH = 160;
+var TAB = '\t';
 var FIREBASE_BUCKET = 'kaeru_uploads';
 var FIREBASE_FILE_NAMES_PATH = FIREBASE_BUCKET + '/filenames/';
 var FIREBASE_TEXT = 'kaeru_text';
@@ -92,6 +93,7 @@ function bindActions() {
     bind('.b_cymbalForward', cymbalForwardAction);
     bind('.b_cymbalBack', cymbalBackAction);
     bind('#b_backup', backupAction);
+    $('#ta_target').on('keydown', inputTabAction);
     $('#f_import').on('change', importBackup);
     $('#ta_receiver').on('change', receiverModified);
     $('#b_firebase_storage_upload').on('change', uploadToFirebaseStorage);
@@ -1196,6 +1198,18 @@ function hsvToRgb(h, s, v) {
             break;
     }
     return [Math.round(r), Math.round(g), Math.round(b)];
+}
+
+function inputTabAction(event) {
+    if (event.key === "Tab") {
+        event.preventDefault();
+        var value = this.value;
+        var sPos = this.selectionStart;
+        var ePos = this.selectionEnd;
+        var cPos = sPos + TAB.length;
+        this.value = value.slice(0, sPos) + TAB + value.slice(ePos);
+        this.setSelectionRange(cPos, cPos);
+    }
 }
 
 //localStorage>>
