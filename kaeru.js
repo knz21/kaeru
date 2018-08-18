@@ -71,6 +71,8 @@ function bindActions() {
     bindWithHistory('#b_single', singleAction);
     bindWithHistory('#b_sortAsc', sortAscAction);
     bindWithHistory('#b_sortDesc', sortDescAction);
+    bindWithHistory('#b_reverseRow', reverseRowAction);
+    bindWithHistory('#b_reverseCol', reverseColAction);
     bindWithHistory('#b_closeUp', closeUpAction);
     bindWithHistory('#b_incHead', includeHeadAction);
     bindWithHistory('#b_incAny', includeAnyAction);
@@ -196,6 +198,10 @@ function execSort(ary, isAsc) {
     });
 }
 
+function execReverse(ary) {
+    return ary.reverse();
+}
+
 function execBreak(ary, proc) {
     var newAry = [];
     ary.forEach(function (val, idx, thisAry) {
@@ -218,6 +224,10 @@ function executeFilter(proc) {
 
 function executeSort(isAsc) {
     setTarget(convert(execSort(getTargetArray(), isAsc)));
+}
+
+function executeReverse() {
+    setTarget(convert(execReverse(getTargetArray())));
 }
 
 function executeBreak(proc) {
@@ -592,6 +602,22 @@ function sortAscAction() {
 
 function sortDescAction() {
     executeSort(false);
+}
+
+function reverseRowAction() {
+    executeReverse()
+}
+
+function reverseColAction() {
+    executeModify(reverse);
+
+    function reverse(str) {
+        var r = "";
+        for (var i = str.length - 1; i >= 0; i--) {
+            r += str[i];
+        }
+        return r;
+    }
 }
 
 function closeUpAction() {
