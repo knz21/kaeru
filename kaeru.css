@@ -137,6 +137,10 @@ textarea {
     width: 100%;
 }
 
+#password > label.checkLabel {
+    display: inline;
+}
+
 #sequence_inputs div {
     float: left;
 }

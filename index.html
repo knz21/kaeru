@@ -171,6 +171,18 @@
         </div>
         <textarea id="ta_replaceDest"></textarea>
     </div>
+    <div id="password">
+        <label>password</label>
+        <input type="number" id="t_passwordLength" value="8">
+        <input type="checkbox" id="c_passwordLower" checked>
+        <label for="c_passwordLower" class="checkLabel">lower</label>
+        <input type="checkbox" id="c_passwordUpper" checked>
+        <label for="c_passwordUpper" class="checkLabel">upper</label>
+        <input type="checkbox" id="c_passwordNumber" checked>
+        <label for="c_passwordNumber" class="checkLabel">number</label>
+        <button id="b_password">generate</button>
+        <input type="text" id="t_password" disabled>
+    </div>
     <div id="sequence">
         <label>sequence</label>
         <input type="text" id="t_seqOrg">

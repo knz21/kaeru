@@ -89,6 +89,7 @@ function bindActions() {
     bindWithHistory('#b_toSnake', toSnakeAction);
     bindWithHistory('#b_multiReplace', multiReplaceAction);
     bindWithHistory('#b_multiReplaceRegex', multiReplaceRegexAction);
+    bind('#b_password', passwordAction);
     bind('#b_sequence', sequenceAction);
     bind('#b_draw', drawAction);
     bind('#b_color_trial', colorTrialAction);
@@ -175,6 +176,10 @@ function setTarget(result) {
 
 function getVal(selector) {
     return $(selector).val();
+}
+
+function getChecked(selector) {
+    return $(selector).prop('checked');
 }
 
 function execModify(ary, proc) {
@@ -775,6 +780,15 @@ function multiReplaceRegexAction() {
     multiReplace(replaceAllRegex);
 }
 
+function passwordAction() {
+    $('#t_password').val(generatePassword(
+        getVal('#t_passwordLength'),
+        getChecked('#c_passwordLower'),
+        getChecked('#c_passwordUpper'),
+        getChecked('#c_passwordNumber')
+    ));
+}
+
 function sequenceAction() {
     var org = getVal('#t_seqOrg');
     var start = getVal('#t_seqStart');
@@ -971,6 +985,18 @@ function multiReplace(replaceFunc) {
     }
 
     setTarget(convert(tgtAry));
+}
+
+function generatePassword(length, hasLower, hasUpper, hasNumber) {
+    var l = isNumber(length) && length > 0 ? length : 8,
+        charSet = (hasLower ? 'abcdefghijklmnopqrstuvwxyz' : '')
+            + (hasUpper ? 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' : '')
+            + (hasNumber ? '0123456789' : ''),
+        p = "";
+    for (var i = 0, n = charSet.length; i < l; ++i) {
+        p += charSet.charAt(Math.floor(Math.random() * n));
+    }
+    return p;
 }
 
 function replaceAll(str, org, dest) {
