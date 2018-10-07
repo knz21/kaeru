@@ -32,6 +32,8 @@ function bindActions() {
     bind('#b_save', saveAction);
     bindWithHistory('#b_clear', clearAction);
     bind('#b_wrap', wrapAction);
+    bind('#b_default', defaultAction);
+    bind('#b_fit', fitAction);
     bind('#b_deleteAll', deleteAllAction);
     bind('#b_text_update', updateTextAction);
     bind('#b_reload_receiver', receiveTextAction);
@@ -282,6 +284,15 @@ function clearAction() {
 
 function wrapAction() {
     $target.attr('wrap', $target.attr('wrap') == 'off' ? 'soft' : 'off');
+}
+
+function defaultAction() {
+    $target.attr('style', '')
+}
+
+function fitAction() {
+    var fontSize = $target.css('font-size');
+    $target.height(getTargetArray().length * (+fontSize.substr(0, fontSize.length - 2) + 14));
 }
 
 function deleteAllAction() {
