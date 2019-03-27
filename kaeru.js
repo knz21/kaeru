@@ -73,6 +73,8 @@ function bindActions() {
     bindWithHistory('#b_single', singleAction);
     bindWithHistory('#b_sortAsc', sortAscAction);
     bindWithHistory('#b_sortDesc', sortDescAction);
+    bindWithHistory('#b_sortByLengthAsc', sortByLengthAscAction);
+    bindWithHistory('#b_sortByLengthDesc', sortByLengthDescAction);
     bindWithHistory('#b_reverseRow', reverseRowAction);
     bindWithHistory('#b_reverseCol', reverseColAction);
     bindWithHistory('#b_closeUp', closeUpAction);
@@ -205,6 +207,16 @@ function execSort(ary, isAsc) {
     });
 }
 
+function execSortByLength(ary, isAsc) {
+    return ary.sort(function (a, b) {
+        if (a.toString().length < b.toString().length) {
+            return isAsc ? -1 : 1;
+        } else {
+            return isAsc ? 1 : -1;
+        }
+    });
+}
+
 function execReverse(ary) {
     return ary.reverse();
 }
@@ -231,6 +243,10 @@ function executeFilter(proc) {
 
 function executeSort(isAsc) {
     setTarget(convert(execSort(getTargetArray(), isAsc)));
+}
+
+function executeSortByLength(isAsc) {
+    setTarget(convert(execSortByLength(getTargetArray(), isAsc)));
 }
 
 function executeReverse() {
@@ -618,6 +634,14 @@ function sortAscAction() {
 
 function sortDescAction() {
     executeSort(false);
+}
+
+function sortByLengthAscAction() {
+    executeSortByLength(true);
+}
+
+function sortByLengthDescAction() {
+    executeSortByLength(false);
 }
 
 function reverseRowAction() {
