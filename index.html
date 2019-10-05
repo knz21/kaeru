@@ -154,7 +154,7 @@
         <br>
         <progress value="0" max="100" id="firebase_storage_progress" class="invisible">0%</progress>
         <div id="firebase_loader_wrapper" class="invisible">
-            <div id="firebase_loader"></div>
+            <div class="progress"></div>
         </div>
         <ul id="download_files"></ul>
     </div>
@@ -227,6 +227,18 @@
         </div>
         <button id="b_sequence">sequence</button>
         <textarea id="ta_seqResult"></textarea>
+    </div>
+    <div id="lgtm">
+        <label>LGTM</label>
+        <button id="b_lgtm">LGTM</button>
+        <button id="b_copy_lgtm">copy</button>
+        <input type="checkbox" id="c_lgtm_300px">
+        <label for="c_lgtm_300px" class="checkLabel">300px</label>
+        <input id="t_lgtm" type="text" disabled="disabled">
+        <div id="lgtm_result">
+            <img id="i_lgtm" src="">
+            <div id="lgtm_progress" class="progress" style="display: none"></div>
+        </div>
     </div>
     <div id="color">
         <label>color</label>

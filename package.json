@@ -17,5 +17,9 @@
   "bugs": {
     "url": "https://github.com/knz21/kaeru/issues"
   },
-  "homepage": "https://github.com/knz21/kaeru#readme"
+  "homepage": "https://github.com/knz21/kaeru#readme",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.3",
+    "node-fetch": "^2.6.0"
+  }
 }

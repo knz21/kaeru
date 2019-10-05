@@ -1,11 +1,25 @@
-var http = require('http');
-var fs = require('fs');
+const http = require('http');
+const fs = require('fs');
+const fetch = require('node-fetch');
+const cheerio = require('cheerio')
+const port = process.env.PORT || 3000;
 
 http.createServer(function (req, res) {
     if (req.method === 'GET') {
         var url = req.url;
         if (url === '/') {
             url = '/index.html';
+        } else if (url === '/lgtm') {
+            res.writeHead(200, {'Content-Type': 'text/json'});
+            fetch('http://www.lgtm.in/g')
+                .then(function (res) {
+                    return res.text()
+                })
+                .then(function (body) {
+                    const $ = cheerio.load(body)
+                    res.end($('#imageUrl').val());
+                });
+            return;
         }
         fs.readFile(__dirname + url, 'utf-8', function (err, data) {
             if (err) {
@@ -26,8 +40,8 @@ http.createServer(function (req, res) {
         res.statusCode = 404;
         res.end('not found');
     }
-}).listen(process.env.PORT);
-console.log('Start server. port:' + process.env.PORT);
+}).listen(port);
+console.log('Start server. port:' + port);
 
 function getContentType(url) {
     var suffix = url.substr(url.lastIndexOf('.') + 1);

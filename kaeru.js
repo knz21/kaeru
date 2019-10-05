@@ -97,10 +97,13 @@ function bindActions() {
     bind('#b_sequence', sequenceAction);
     bind('#b_draw', drawAction);
     bind('#b_color_trial', colorTrialAction);
+    bind('#b_lgtm', lgtmAction);
+    bind('#b_copy_lgtm', copyLgtmAction);
     bind('.b_cymbalForward', cymbalForwardAction);
     bind('.b_cymbalBack', cymbalBackAction);
     bind('#b_backup', backupAction);
     $('#ta_target').on('keydown', inputTabAction);
+    $('#c_lgtm_300px').on('change', toggleWidth);
     $('#f_import').on('change', importBackup);
     $('#ta_receiver').on('change', receiverModified);
     $('#b_firebase_storage_upload').on('change', uploadToFirebaseStorage);
@@ -898,6 +901,47 @@ function backupAction() {
     if (confirm('Backup save data!')) {
         downloadFile(BACKUP_FILE_PREFIX + formatDateStr(), getBackupContent());
     }
+}
+
+function lgtmAction() {
+    const $progress = $('#lgtm_progress');
+    const $image = $('#i_lgtm');
+    $image.prop('src', '');
+    $progress.show();
+    fetch('lgtm')
+        .then(function (response) {
+            return response.text();
+        })
+        .then(function (body) {
+            const width = getChecked('#c_lgtm_300px') ? ' width="300px"' : '';
+            $('#t_lgtm').val('<img src="' + body + '" alt="LGTM"' + width + ' />');
+            $image.prop('src', body);
+            if (getChecked('#c_lgtm_300px')) {
+                $image.width(300);
+            } else {
+                $image.removeAttr('style');
+            }
+            $progress.hide();
+        });
+}
+
+function toggleWidth(change) {
+    const $input = $('#t_lgtm');
+    const $image = $('#i_lgtm');
+    if (change.target.checked) {
+        $input.val($input.val().replace(' />', ' width="300px" />'))
+        $image.width(300);
+    } else {
+        $input.val($input.val().replace(' width="300px" />', ' />'))
+        $image.removeAttr('style');
+    }
+}
+
+function copyLgtmAction() {
+    var input = $('#t_lgtm');
+    input.attr('disabled', false);
+    setCopy(input);
+    input.attr('disabled', true);
 }
 
 //Actions<<
